@@ -13,7 +13,7 @@ from .configure.resolve import (
 )
 from .constants import RuntimeProtocol, TemplateDirSelection
 from .features import iac_feature_registry, sdk_feature_registry
-from .types import CreateIACProvider, CreateSDKProvider, ProjectContext
+from .types import CreateIACProvider, CreateSDKProvider, ProjectContext, CreateModelProviderProvider
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
 
@@ -22,6 +22,7 @@ def generate_project(
     name: str,
     sdk_provider: CreateSDKProvider,
     iac_provider: CreateIACProvider | None,
+    model_provider: CreateModelProviderProvider | None,
     agent_config: BedrockAgentCoreAgentSchema | None,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""

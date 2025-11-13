@@ -15,6 +15,8 @@ CreateRuntimeProtocol = Literal["HTTP", "MCP", "A2A"]
 # until we have direct code deployment constructs, only support container deploy
 CreateDeploymentType = Literal["container"]
 
+CreateModelProviderProvider = Literal["Bedrock", "OpenAI"]
+
 
 @dataclass
 class ProjectContext:
