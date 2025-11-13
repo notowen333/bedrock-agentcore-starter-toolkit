@@ -5,10 +5,11 @@ from pathlib import Path
 from time import sleep
 
 import typer
+from click import prompt
 
 from ...cli.common import _handle_error
 from ...create.generate import generate_project
-from ...create.types import CreateIACProvider, CreateSDKProvider
+from ...create.types import CreateIACProvider, CreateSDKProvider, CreateModelProviderProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..common import _handle_warn
@@ -33,6 +34,12 @@ sdk_option = typer.Option(
     help="SDK provider (Strands, ClaudeAgents, OpenAI, etc.)",
 )
 
+model_provider_option = typer.Option(
+    None,
+    "--model-provider", "-mp",
+    help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
+)
+
 
 @create_app.callback(invoke_without_command=True)
 def create(
@@ -42,6 +49,7 @@ def create(
     ),
     iac: CreateIACProvider = iac_option,
     sdk: CreateSDKProvider = sdk_option,
+    model_provider: CreateModelProviderProvider = model_provider_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -82,11 +90,14 @@ def create(
     # Interactively accept IAC/SDK if not provided
     valid_iac = list(CreateIACProvider.__args__)
     valid_sdk = list(CreateSDKProvider.__args__)
+    valid_model_providers = list(CreateModelProviderProvider.__args__)
     if not iac:
         iac = prompt_choice_until_valid_input(label="IAC provider", choices=valid_iac)
     # entrypoint provided != . means src is provided and we don't need sdk
     if not sdk and (not agent_config or agent_config.entrypoint == "."):
         sdk = prompt_choice_until_valid_input(label="SDK provider", choices=valid_sdk)
+    if not model_provider:
+        model_provider = prompt_choice_until_valid_input(label="Model provider", choices=valid_model_providers)
 
     if not configure_yaml.exists():
         _handle_warn(
@@ -96,4 +107,4 @@ def create(
         sleep(2)  # so above message can be seen clearly
 
     # Create template project
-    generate_project(project_name, sdk, iac, agent_config)
+    generate_project(project_name, sdk, iac, model_provider, agent_config)
