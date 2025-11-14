@@ -163,7 +163,7 @@ def select_one(title: str, options: dict[str, str], default: str | None = None):
 # ---------------------------------------------------------------------------
 
 
-def ask_text(title: str, default: str | None = None) -> str | None:
+def ask_text(title: str, default: str | None = None, redact: bool = False) -> str | None:
     """Prompt user for a single-line text value."""
     field = TextArea(
         text=default or "",
@@ -171,6 +171,7 @@ def ask_text(title: str, default: str | None = None) -> str | None:
         style="class:option-name",
         focus_on_click=True,
         wrap_lines=False,
+        password=redact
     )
 
     kb = KeyBindings()
@@ -216,7 +217,6 @@ def ask_text(title: str, default: str | None = None) -> str | None:
     sleep(0.10)
     print()
     return result
-
 
 # ---------------------------------------------------------------------------
 # ASK CHOICE WITH AUTOCOMPLETE

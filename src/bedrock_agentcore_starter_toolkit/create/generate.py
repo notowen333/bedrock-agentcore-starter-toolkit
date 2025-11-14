@@ -16,6 +16,7 @@ from .features import iac_feature_registry, sdk_feature_registry
 from .types import CreateIACProvider, CreateModelProvider, CreateSDKProvider, ProjectContext
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
+from .util.dotenv import _write_env_file_directly
 
 
 def generate_project(
@@ -23,6 +24,7 @@ def generate_project(
     sdk_provider: CreateSDKProvider,
     iac_provider: CreateIACProvider | None,
     model_provider: CreateModelProvider | None,
+    provider_api_key: str,
     agent_config: BedrockAgentCoreAgentSchema | None,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""
@@ -81,11 +83,12 @@ def generate_project(
         observability_enabled=True,
     )
 
-    # all create projects iac or not get baseline and sdk
     _apply_baseline_and_sdk_features(ctx)
 
     if not ctx.iac_provider:
         write_minimal_create_runtime_yaml(ctx)
+        # Write .env file directly (outside template system for security)
+        _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
         return
     else:
         _apply_iac_generation(ctx, agent_config)
@@ -113,6 +116,9 @@ def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
         # Call before_appl to ensure dependencies are set correctly based on model provider
         sdk_feature.before_apply(ctx)
         deps.update(sdk_feature.python_dependencies)
+
+    if ctx.model_provider != ModelProvider.Bedrock:
+        deps.add("python-dotenv >= 1.2.1")
 
     ctx.python_dependencies = sorted(deps)
 

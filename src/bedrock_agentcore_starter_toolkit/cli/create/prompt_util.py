@@ -5,7 +5,7 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
 from ...cli.common import console
-from ..cli_ui import select_one, show_welcome
+from ..cli_ui import ask_text, select_one, show_welcome
 
 
 def show_create_welcome():
@@ -19,6 +19,15 @@ def show_create_welcome():
             "👉 Press any key to continue...",
         ],
     )
+
+
+def ask_text_required(title: str, redact: bool = False) -> str:
+    """Prompt user for required text input, looping until non-empty value is provided."""
+    while True:
+        result = ask_text(title, default=None, redact=redact)
+        if result and result.strip():
+            return result.strip()
+        # Empty input, loop and ask again
 
 
 def prompt_runtime_or_monorepo():
@@ -35,6 +44,24 @@ def prompt_runtime_or_monorepo():
     )
     return choice
 
+def prompt_model_providers(is_runtime_only: bool):
+    """Prompt user to choose a model provider based on deployment context.
+
+    Args:
+        is_runtime_only: True for runtime-only deployments, False for monorepo (IaC)
+
+    Returns:
+        Selected model provider name
+    """
+    from ...create.constants import ModelProvider
+
+    available_providers = ModelProvider.get_providers_for_context(is_runtime_only)
+
+    choice = select_one(
+        title="Select a model provider:",
+        options=available_providers
+    )
+    return choice
 
 def prompt_iac_provider():
     """Prompt user to choose CDK or Terraform as the IaC provider."""

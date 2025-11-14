@@ -8,12 +8,13 @@ from typing import Optional
 import typer
 
 from ...cli.common import _handle_error
+from ...create.constants import ModelProvider
 from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateSDKProvider, CreateModelProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..cli_ui import ask_choice, ask_text
-from .prompt_util import prompt_iac_provider, prompt_runtime_or_monorepo, show_create_welcome
+from .prompt_util import ask_text_required, prompt_iac_provider, prompt_runtime_or_monorepo, show_create_welcome, prompt_model_providers
 
 create_app = typer.Typer(
     name="create", help="create an agent core project", invoke_without_command=True, no_args_is_help=False
@@ -42,6 +43,10 @@ model_provider_option = typer.Option(
     None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
 )
 
+model_provider_api_key_option = typer.Option(
+    None, "--provider-api-key", "-key", help="API key for the model provider (required for non-Bedrock providers)"
+)
+
 VALID_SDK = list(CreateSDKProvider.__args__)
 VALID_MODEL_PROVIDERS = list(CreateModelProvider.__args__)
 
@@ -53,7 +58,8 @@ def create(
     iac: CreateIACProvider = iac_option,
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
-    model_provider: CreateModelProvider = model_provider_option
+    model_provider: CreateModelProvider = model_provider_option,
+    provider_api_key: Optional[str] = model_provider_api_key_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -84,8 +90,14 @@ def create(
         if not sdk:
             sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
         if not model_provider:
-            model_provider = ask_choice(title="Model Provider: ", choices=VALID_MODEL_PROVIDERS)
-        generate_project(project_name, sdk, model_provider=model_provider, iac_provider=None, agent_config=None)
+            model_provider = prompt_model_providers(is_runtime_only=True)
+
+        # Only ask for API key if model provider is not Bedrock
+        if model_provider != ModelProvider.Bedrock and not provider_api_key:
+                provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
+
+        generate_project(project_name, sdk, provider_api_key=provider_api_key,
+                         model_provider=model_provider, iac_provider=None, agent_config=None)
         return
 
     # iac path
@@ -117,7 +129,7 @@ def create(
     if not iac:
         iac = prompt_iac_provider()
     if not model_provider:
-        model_provider = ask_choice(title="Model Provider: ", choices=VALID_MODEL_PROVIDERS)
+        model_provider = prompt_model_providers(is_runtime_only=False)
 
     if not configure_yaml.exists():
         # _handle_warn(
@@ -129,4 +141,4 @@ def create(
 
     # Create template project
     sleep(0.2)
-    generate_project(project_name, sdk, iac, model_provider, agent_config)
+    generate_project(project_name, sdk, iac, model_provider, provider_api_key=None, agent_config=agent_config)

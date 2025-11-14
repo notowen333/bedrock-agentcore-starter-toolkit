@@ -50,6 +50,29 @@ class SDKProvider:
     CREWAI = "CrewAI"
 
 class ModelProvider:
-    """Supported Model Providers. """
+    """Supported Model Providers with context-aware availability."""
     OpenAI = "OpenAI"
     Bedrock = "Bedrock"
+
+    # Metadata for each provider
+    DESCRIPTIONS = {
+        "Bedrock": "AWS Bedrock foundation models",
+        "OpenAI": "OpenAI models (You will be prompted to supply an API Key in the next step)"
+    }
+
+    # Which providers support which deployment types
+    MONOREPO_SUPPORTED = {"Bedrock"}  # Only Bedrock for IaC deployments
+    RUNTIME_ONLY_SUPPORTED = {"Bedrock", "OpenAI"}  # All providers for runtime
+
+    @classmethod
+    def get_providers_for_context(cls, is_runtime_only: bool) -> dict[str, str]:
+        """Get available providers with descriptions for given context.
+
+        Args:
+            is_runtime_only: True for runtime-only deployments, False for monorepo (IaC)
+
+        Returns:
+            Dictionary mapping provider names to their descriptions
+        """
+        available = cls.RUNTIME_ONLY_SUPPORTED if is_runtime_only else cls.MONOREPO_SUPPORTED
+        return {provider: cls.DESCRIPTIONS[provider] for provider in available}

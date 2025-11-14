@@ -75,7 +75,10 @@ class Feature(ABC):
             dest = dest_dir / rel.with_suffix("")  # remove .j2 suffix
             dest.parent.mkdir(parents=True, exist_ok=True)
             template = env.get_template(rel.as_posix())
-            dest.write_text(template.render(context.dict()))
+            rendered_content = template.render(context.dict())
+            # Only write the file if it has content (skip empty files)
+            if rendered_content.strip():
+                dest.write_text(rendered_content)
 
     def render_dir(self, dest_dir: Path, context: ProjectContext) -> None:
         """Render templates for the variant only (common handled automatically in apply)."""
