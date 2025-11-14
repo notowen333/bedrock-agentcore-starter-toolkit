@@ -8,13 +8,19 @@ from typing import Optional
 import typer
 
 from ...cli.common import _handle_error
-from ...create.constants import ModelProvider
 from ...create.generate import generate_project
-from ...create.types import CreateIACProvider, CreateSDKProvider, CreateModelProvider
+from ...create.types import CreateIACProvider, CreateModelProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..cli_ui import ask_choice, ask_text
-from .prompt_util import ask_text_required, prompt_iac_provider, prompt_runtime_or_monorepo, show_create_welcome, prompt_model_providers
+from ..runtime.commands import configure_impl
+from .prompt_util import (
+    prompt_configure,
+    prompt_iac_provider,
+    prompt_model_provider,
+    prompt_runtime_or_monorepo,
+    show_create_welcome,
+)
 
 create_app = typer.Typer(
     name="create", help="create an agent core project", invoke_without_command=True, no_args_is_help=False
@@ -59,12 +65,11 @@ def create(
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
     model_provider: CreateModelProvider = model_provider_option,
-    provider_api_key: Optional[str] = model_provider_api_key_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
         return
-
+    # welcome command
     show_create_welcome()
 
     if not project_name:
@@ -90,14 +95,9 @@ def create(
         if not sdk:
             sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
         if not model_provider:
-            model_provider = prompt_model_providers(is_runtime_only=True)
-
-        # Only ask for API key if model provider is not Bedrock
-        if model_provider != ModelProvider.Bedrock and not provider_api_key:
-                provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
-
-        generate_project(project_name, sdk, provider_api_key=provider_api_key,
-                         model_provider=model_provider, iac_provider=None, agent_config=None)
+            model_provider = prompt_model_provider()
+        _prompt_configure_if_not_present()
+        generate_project(project_name, sdk, model_provider=model_provider, iac_provider=None, agent_config=None)
         return
 
     # iac path
@@ -123,22 +123,24 @@ def create(
 
     # Interactively accept IAC/SDK if not provided
     # entrypoint provided != . means src is provided and we don't need sdk
-
     if not sdk and (not agent_config or agent_config.entrypoint == "."):
         sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+        model_provider = prompt_model_provider()
+
     if not iac:
         iac = prompt_iac_provider()
-    if not model_provider:
-        model_provider = prompt_model_providers(is_runtime_only=False)
 
-    if not configure_yaml.exists():
-        # _handle_warn(
-        #    "No .bedrock_agentcore.yaml file detected, using create configuration defaults. "
-        #    "To specifiy project configuration, first run agentcore configure."
-        # )
-        # sleep(2)  # so above message can be seen clearly
-        pass
+    _prompt_configure_if_not_present()
 
     # Create template project
     sleep(0.2)
-    generate_project(project_name, sdk, iac, model_provider, provider_api_key=None, agent_config=agent_config)
+    generate_project(project_name, sdk, iac, model_provider, agent_config)
+
+
+def _prompt_configure_if_not_present():
+    configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
+    if not configure_yaml.exists():
+        no_title = "No, use default settings"
+        if prompt_configure(no_title) != no_title:
+            configure_impl(create=True)
+        pass

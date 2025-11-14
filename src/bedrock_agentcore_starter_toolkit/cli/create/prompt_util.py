@@ -5,7 +5,8 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
 from ...cli.common import console
-from ..cli_ui import ask_text, select_one, show_welcome
+from ...create.constants import IACProvider, ModelProvider
+from ..cli_ui import select_one, show_welcome, ask_text
 
 
 def show_create_welcome():
@@ -63,15 +64,46 @@ def prompt_model_providers(is_runtime_only: bool):
     )
     return choice
 
-def prompt_iac_provider():
+def prompt_iac_provider() -> IACProvider:
     """Prompt user to choose CDK or Terraform as the IaC provider."""
     choice = select_one(
         title="Select the IaC provider for your generated monorepo project",
         options={
-            "CDK": (
+            IACProvider.CDK: (
                 "Creates a TypeScript Node project to deploy and manage your AgentCore resources in AWS CloudFormation"
             ),
-            "Terraform": ("Creates a Terraform project to deploy and manage your AgentCore resources with Terraform"),
+            IACProvider.TERRAFORM: (
+                "Creates a Terraform project to deploy and manage your AgentCore resources with Terraform"
+            ),
+        },
+    )
+    return choice
+
+
+def prompt_model_provider() -> ModelProvider:
+    """Prompt user to choose an LLM model provider."""
+    choice = select_one(
+        title="Model provider selection:",
+        options={
+            ModelProvider.Bedrock: ("Use Amazon Bedrock to provide LLM inference authenticated with AWS"),
+            ModelProvider.OpenAI: (
+                "Use an OpenAI API key to provide LLM inference. Store the credential in AgentCore Identity."
+            ),
+        },
+    )
+    return choice
+
+
+def prompt_configure(no_title: str):
+    """Prompt user to decide if they want to run agentcore configure."""
+    choice = select_one(
+        title="Use existing resource configuration?",
+        options={
+            no_title: ("Start fresh and deploy new resources for your project."),
+            "Yes, define existing resources and configuration settings": (
+                "I have existing resources (JWT authorizers, IAM roles, VPC, or AgentCore Memory) "
+                "that I want to import."
+            ),
         },
     )
     return choice

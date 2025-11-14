@@ -36,16 +36,6 @@ def generate_project(
 
     template_dir = TemplateDirSelection.MONOREPO if iac_provider else TemplateDirSelection.RUNTIME_ONLY
 
-    # Validate: IaC (monorepo) only supports Bedrock model provider
-    if iac_provider and model_provider and model_provider != ModelProvider.Bedrock:
-        _handle_error(
-            "Monorepo (IaC code generation) only supports Bedrock model provider. ",
-            ValueError(
-                f"IaC deployments (monorepo) only support Bedrock model provider. "
-                f"Got: {model_provider}. Use --init (Runtime) for non-Bedrock model providers."
-            ),
-        )
-
     # the ProjectContext defines what is generated. It is passed into the jinja templates that are rendered.
     ctx = ProjectContext(
         # high level project config
