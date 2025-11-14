@@ -3,6 +3,7 @@ from bedrock_agentcore.runtime import BedrockAgentCoreApp
 import logging
 import sys
 import os
+from mcp_client.client import get_streamable_http_mcp_client
 
 if os.getenv("LOCAL_DEV") == "1":
     @asynccontextmanager
@@ -10,7 +11,6 @@ if os.getenv("LOCAL_DEV") == "1":
         yield result
     mcp_server = async_nullcontext([])
 else:
-    from mcp_client.client import get_streamable_http_mcp_client
     # Import AgentCore Gateway as Streamable HTTP MCP Server
     mcp_server = get_streamable_http_mcp_client()
 

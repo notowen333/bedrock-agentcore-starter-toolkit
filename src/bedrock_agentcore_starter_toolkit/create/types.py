@@ -8,7 +8,7 @@ CreateSDKProvider = Literal["Strands", "LangGraph", "GoogleADK", "OpenAIAgents",
 
 CreateIACProvider = Literal["CDK", "Terraform"]
 
-CreateTemplateDirSelection = Literal["default", "common", "mcp_runtime", "runtime_only"]
+CreateTemplateDirSelection = Literal["monorepo", "common", "monorepo_mcp_runtime", "runtime_only"]
 
 CreateRuntimeProtocol = Literal["HTTP", "MCP", "A2A"]
 

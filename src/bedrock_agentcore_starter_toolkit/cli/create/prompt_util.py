@@ -5,7 +5,20 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
 from ...cli.common import console
-from .pretty_selector import select_one
+from ..cli_ui import select_one, show_welcome
+
+
+def show_create_welcome():
+    """Give a welcome message when create is run."""
+    show_welcome(
+        "Welcome to agentcore create!",
+        [
+            "Choose your Agent SDK and desired configuration to create an Amazon Bedrock AgentCore ⚙️\n",
+            "project that best meets your requirements.\n",
+            "",
+            "👉 Press any key to continue...",
+        ],
+    )
 
 
 def prompt_runtime_or_monorepo():
@@ -13,8 +26,11 @@ def prompt_runtime_or_monorepo():
     choice = select_one(
         title="Select a create project configuration:",
         options={
-            "Runtime": "Agent SDK python runtime code deployed with `agentcore launch`",
-            "Monorepo": ("Monorepo with runtime code and infrastructure as code (IaC) modeling AgentCore resources"),
+            "Runtime": "Lightweight. Agent SDK python runtime code deployed with `agentcore launch`",
+            "Monorepo": (
+                "Full featured. Monorepo with runtime code and infrastructure as code (IaC) modeling "
+                "AgentCore resources"
+            ),
         },
     )
     return choice

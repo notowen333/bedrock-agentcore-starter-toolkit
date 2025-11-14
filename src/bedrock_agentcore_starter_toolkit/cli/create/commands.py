@@ -12,11 +12,8 @@ from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
-from .pretty_selector import ask_choice, ask_text, show_welcome
-from .prompt_util import (
-    prompt_iac_provider,
-    prompt_runtime_or_monorepo,
-)
+from ..cli_ui import ask_choice, ask_text
+from .prompt_util import prompt_iac_provider, prompt_runtime_or_monorepo, show_create_welcome
 
 create_app = typer.Typer(
     name="create", help="create an agent core project", invoke_without_command=True, no_args_is_help=False
@@ -56,7 +53,7 @@ def create(
     if ctx.invoked_subcommand:
         return
 
-    show_welcome()
+    show_create_welcome()
 
     if not project_name:
         project_name = ask_text(title="Project Name (alphanumeric):")

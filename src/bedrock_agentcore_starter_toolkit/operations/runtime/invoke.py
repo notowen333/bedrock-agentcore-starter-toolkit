@@ -30,7 +30,7 @@ def invoke_bedrock_agentcore(
     """Invoke deployed Bedrock AgentCore endpoint."""
     # Load project configuration
     project_config = load_config(config_path)
-    if project_config.is_agentcore_create_project:
+    if project_config.is_agentcore_create_with_iac:
         project_config = resolve_create_project_config(config_path)
     agent_config = project_config.get_agent_config(agent_name)
 

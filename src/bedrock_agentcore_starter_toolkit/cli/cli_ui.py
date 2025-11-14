@@ -312,7 +312,7 @@ def ask_choice(title: str, choices: list[str]) -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def show_welcome():
+def show_welcome(title: str, description: list[str]) -> None:
     """Display a clean welcome screen before the questionnaire begins.
 
     User presses any key to continue.
@@ -332,16 +332,13 @@ def show_welcome():
         ev.app.exit(result=None)
 
     message_lines = [
-        ("class:title", "Welcome.\n"),
+        ("class:title", f"{title}\n"),
         ("", "\n"),
-        (
-            "class:option-desc",
-            "Choose your Agent SDK and desired configuration to create an Amazon Bedrock AgentCore ⚙️\n",
-        ),
-        ("class:option-desc", "project that best meets your requirements.\n"),
-        ("", "\n"),
-        ("class:option-desc", "👉 Press any key to continue..."),
     ]
+
+    for line in description:
+        style = "class:option-desc" if line.strip() else ""
+        message_lines.append((style, line))
 
     message_window = Window(
         FormattedTextControl(message_lines, focusable=True),

@@ -15,7 +15,7 @@ from .constants import RuntimeProtocol, TemplateDirSelection
 from .features import iac_feature_registry, sdk_feature_registry
 from .types import CreateIACProvider, CreateSDKProvider, ProjectContext
 from .util.console_print import emit_create_completed_message
-from .util.create_with_iac_yaml import write_minimal_create_with_iac_project_yaml
+from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
 
 
 def generate_project(
@@ -31,6 +31,8 @@ def generate_project(
     src_path = Path(output_path / "src")
     src_path.mkdir(exist_ok=False)
 
+    template_dir = TemplateDirSelection.MONOREPO if iac_provider else TemplateDirSelection.RUNTIME_ONLY
+
     # the ProjectContext defines what is generated. It is passed into the jinja templates that are rendered.
     ctx = ProjectContext(
         # high level project config
@@ -42,7 +44,7 @@ def generate_project(
         sdk_provider=sdk_provider,
         iac_provider=iac_provider,
         deployment_type="container",
-        template_dir_selection=TemplateDirSelection.DEFAULT if iac_provider else TemplateDirSelection.RUNTIME_ONLY,
+        template_dir_selection=template_dir,
         runtime_protocol=RuntimeProtocol.HTTP,
         python_dependencies=[],
         src_implementation_provided=False,
@@ -69,7 +71,7 @@ def generate_project(
 
     if not ctx.iac_provider:
         sdk_feature_registry[sdk_provider]().apply(ctx)
-        # todo: write some .bedrock_agentcore.yaml here
+        write_minimal_create_runtime_yaml(ctx)
         return
 
     # resolve above defaults with the configure context if present
