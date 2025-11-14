@@ -2,9 +2,7 @@
 
 from pathlib import Path
 
-from rich.pretty import Pretty
-
-from ..cli.common import _handle_error, console
+from ..cli.common import _handle_error
 from ..cli.create.prompt_util import prompt_confirm_continue
 from ..utils.runtime.container import ContainerRuntime
 from ..utils.runtime.schema import BedrockAgentCoreAgentSchema
@@ -79,8 +77,8 @@ def generate_project(
         resolve_agent_config_with_project_context(ctx, agent_config)
 
     # ctx is resolved, ready to start generating
-    console.print("[cyan] Create generating with the following configuration: [/cyan]")
-    console.print(Pretty(ctx))
+    # console.print("[cyan] Create generating with the following configuration: [/cyan]")
+    # console.print(Pretty(ctx))
 
     if ctx.src_implementation_provided:
         # copy over runtime code and just apply the IAC feature

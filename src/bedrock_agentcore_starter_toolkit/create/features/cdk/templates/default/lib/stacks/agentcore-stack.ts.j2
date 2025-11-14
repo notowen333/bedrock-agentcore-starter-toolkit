@@ -70,7 +70,7 @@ export class AgentCoreStack extends cdk.Stack {
         });
         const cognitoDomain = cognitoUserPool.addDomain(`${props.appName}-CognitoDomain`, {
             cognitoDomain: {
-                domainPrefix: `${props.appName}-${region}`,
+                domainPrefix: `${props.appName.toLowerCase()}-${region}`,
             },
         });
         const cognitoTokenUrl = cognitoDomain.baseUrl() + '/oauth2/token';
