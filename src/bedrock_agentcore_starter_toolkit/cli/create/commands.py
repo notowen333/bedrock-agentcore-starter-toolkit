@@ -44,20 +44,6 @@ model_provider_option = typer.Option(
 
 VALID_SDK = list(CreateSDKProvider.__args__)
 
-model_provider_option = typer.Option(
-    None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
-)
-
-runtime_init_option = typer.Option(
-    None, "--init", help="Use create to initialize the runtime agent SDK code for a project"
-)
-
-model_provider_option = typer.Option(
-    None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
-)
-
-VALID_SDK = list(CreateSDKProvider.__args__)
-
 
 @create_app.callback(invoke_without_command=True)
 def create(
@@ -96,7 +82,7 @@ def create(
     if runtime_init:
         if not sdk:
             sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
-        generate_project(project_name, sdk, None, None)
+        generate_project(project_name, sdk, model_provider=model_provider, iac_provider=None, agent_config=None)
         return
 
     # iac path
@@ -138,4 +124,4 @@ def create(
 
     # Create template project
     sleep(0.2)
-    generate_project(project_name, sdk, iac, agent_config)
+    generate_project(project_name, sdk, iac, model_provider, agent_config)
