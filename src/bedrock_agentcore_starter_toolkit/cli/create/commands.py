@@ -51,6 +51,12 @@ model_provider_option = typer.Option(
     help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
 )
 
+runtime_init_option = typer.Option(
+    None, "--init", help="Use create to initialize the runtime agent SDK code for a project"
+)
+
+VALID_SDK = list(CreateSDKProvider.__args__)
+
 
 @create_app.callback(invoke_without_command=True)
 def create(
@@ -60,7 +66,6 @@ def create(
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
     model_provider: CreateModelProviderProvider = model_provider_option,
-    model_provider: CreateModelProviderProvider = model_provider_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
