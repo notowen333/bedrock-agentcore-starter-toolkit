@@ -6,7 +6,6 @@ from time import sleep
 from typing import Optional
 
 import typer
-from click import prompt
 
 from ...cli.common import _handle_error
 from ...create.generate import generate_project
@@ -46,9 +45,7 @@ model_provider_option = typer.Option(
 VALID_SDK = list(CreateSDKProvider.__args__)
 
 model_provider_option = typer.Option(
-    None,
-    "--model-provider", "-mp",
-    help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
+    None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
 )
 
 runtime_init_option = typer.Option(
