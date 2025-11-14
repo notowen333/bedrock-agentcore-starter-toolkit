@@ -24,7 +24,7 @@ def generate_project(
     sdk_provider: CreateSDKProvider,
     iac_provider: CreateIACProvider | None,
     model_provider: CreateModelProvider | None,
-    provider_api_key: str,
+    provider_api_key: str | None,
     agent_config: BedrockAgentCoreAgentSchema | None,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""
@@ -77,8 +77,9 @@ def generate_project(
 
     if not ctx.iac_provider:
         write_minimal_create_runtime_yaml(ctx)
-        # Write .env file directly (outside template system for security)
-        _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
+        if provider_api_key:
+            # Write .env file directly (outside template system for security)
+            _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
         return
     else:
         _apply_iac_generation(ctx, agent_config)

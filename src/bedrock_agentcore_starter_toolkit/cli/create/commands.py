@@ -8,6 +8,7 @@ from typing import Optional
 import typer
 
 from ...cli.common import _handle_error
+from ...create.constants import ModelProvider
 from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateModelProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
@@ -15,6 +16,7 @@ from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCor
 from ..cli_ui import ask_choice, ask_text
 from ..runtime.commands import configure_impl
 from .prompt_util import (
+    ask_text_required,
     prompt_configure,
     prompt_iac_provider,
     prompt_model_provider,
@@ -65,6 +67,7 @@ def create(
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
     model_provider: CreateModelProvider = model_provider_option,
+    provider_api_key: Optional[str] = model_provider_api_key_option,
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -96,8 +99,17 @@ def create(
             sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
         if not model_provider:
             model_provider = prompt_model_provider()
+        if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
+            provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
         _prompt_configure_if_not_present()
-        generate_project(project_name, sdk, model_provider=model_provider, iac_provider=None, agent_config=None)
+        generate_project(
+            name=project_name,
+            sdk_provider=sdk,
+            model_provider=model_provider,
+            provider_api_key=provider_api_key,
+            iac_provider=None,
+            agent_config=None,
+        )
         return
 
     # iac path
@@ -134,7 +146,14 @@ def create(
 
     # Create template project
     sleep(0.2)
-    generate_project(project_name, sdk, iac, model_provider, agent_config)
+    generate_project(
+        name=project_name,
+        sdk_provider=sdk,
+        iac_provider=iac,
+        model_provider=model_provider,
+        provider_api_key=None,  # Not supported for IAC until Identity has constructs
+        agent_config=agent_config,
+    )
 
 
 def _prompt_configure_if_not_present():
