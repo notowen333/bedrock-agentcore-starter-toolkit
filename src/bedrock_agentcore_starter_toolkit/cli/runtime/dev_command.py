@@ -75,39 +75,6 @@ def dev(
         _handle_error(f"Failed to start development server: {e}")
 
 
-def _setup_dev_environment(envs: List[str]) -> dict:
-    """Parse environment variables and setup development environment with port handling."""
-    env_vars = {}
-    if envs:
-        for env_var in envs:
-            if "=" not in env_var:
-                _handle_error(f"Invalid environment variable format: {env_var}. Use KEY=VALUE format.")
-            key, value = env_var.split("=", 1)
-            env_vars[key] = value
-
-    # Prepare environment
-    local_env = dict(os.environ)
-    local_env.update(env_vars)
-    local_env["LOCAL_DEV"] = "1"
-
-    # Add src directory to Python path if it exists (for local imports)
-    src_dir = Path("src")
-    if src_dir.exists():
-        current_pythonpath = local_env.get("PYTHONPATH", "")
-        src_path = str(src_dir.absolute())
-        if current_pythonpath:
-            local_env["PYTHONPATH"] = f"{src_path}:{current_pythonpath}"
-        else:
-            local_env["PYTHONPATH"] = src_path
-
-    # Handle port: use user-specified PORT or find available one
-    if "PORT" not in local_env:
-        port = _find_available_port()
-        local_env["PORT"] = str(port)
-
-    return local_env
-
-
 def _get_module_path_and_agent_name(config_path: Path, agent: Optional[str]) -> tuple[str, str]:
     """Get module path and agent name, handling missing YAML gracefully."""
     if not config_path.exists():
@@ -177,6 +144,39 @@ def _convert_entrypoint_to_module_path(entrypoint_path: Path, project_root: Path
     except ValueError:
         # If entrypoint is outside project root, fall back to filename only
         return f"{entrypoint_path.stem}:app"
+
+
+def _setup_dev_environment(envs: List[str]) -> dict:
+    """Parse environment variables and setup development environment with port handling."""
+    env_vars = {}
+    if envs:
+        for env_var in envs:
+            if "=" not in env_var:
+                _handle_error(f"Invalid environment variable format: {env_var}. Use KEY=VALUE format.")
+            key, value = env_var.split("=", 1)
+            env_vars[key] = value
+
+    # Prepare environment
+    local_env = dict(os.environ)
+    local_env.update(env_vars)
+    local_env["LOCAL_DEV"] = "1"
+
+    # Add src directory to Python path if it exists (for local imports)
+    src_dir = Path("src")
+    if src_dir.exists():
+        current_pythonpath = local_env.get("PYTHONPATH", "")
+        src_path = str(src_dir.absolute())
+        if current_pythonpath:
+            local_env["PYTHONPATH"] = f"{src_path}:{current_pythonpath}"
+        else:
+            local_env["PYTHONPATH"] = src_path
+
+    # Handle port: use user-specified PORT or find available one
+    if "PORT" not in local_env:
+        port = _find_available_port()
+        local_env["PORT"] = str(port)
+
+    return local_env
 
 
 def _find_available_port(start_port: int = 8080) -> int:
