@@ -55,6 +55,10 @@ runtime_init_option = typer.Option(
     None, "--init", help="Use create to initialize the runtime agent SDK code for a project"
 )
 
+model_provider_option = typer.Option(
+    None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
+)
+
 VALID_SDK = list(CreateSDKProvider.__args__)
 
 
