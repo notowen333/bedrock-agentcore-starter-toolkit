@@ -2,13 +2,12 @@
 
 from pathlib import Path
 
-from ...services.ecr import get_region
 from ...services.runtime import BedrockAgentCoreClient, generate_session_id
 from .config import load_config, save_config
 from .schema import BedrockAgentCoreConfigSchema
 
 
-def resolve_create_project_config() -> BedrockAgentCoreConfigSchema:
+def resolve_create_with_iac_project_config() -> BedrockAgentCoreConfigSchema:
     """Handle the unset create config. Save a new one and return it.
 
     Create command can't populate the runtime id/arn because it's not known until the IAC is deployed
@@ -22,8 +21,6 @@ def resolve_create_project_config() -> BedrockAgentCoreConfigSchema:
     if not create_project.is_agentcore_create_with_iac:
         return  # no-op
 
-    region = get_region()
-    default_agent_config.aws.region = region
     default_runtime_config = default_agent_config.bedrock_agentcore
 
     runtimeId = default_runtime_config.agent_id
@@ -31,7 +28,7 @@ def resolve_create_project_config() -> BedrockAgentCoreConfigSchema:
     if not (runtimeId and runtimeArn):
         # find the agent based on name, count matches for name-conflict edge case
         match_count = 0
-        client = BedrockAgentCoreClient(region=region)
+        client = BedrockAgentCoreClient(region=default_agent_config.aws.region)
         for agent in client.list_agents():
             if agent["agentRuntimeName"] == default_agent:
                 runtimeId = agent["agentRuntimeId"]

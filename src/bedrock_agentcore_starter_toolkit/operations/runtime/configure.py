@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple
 import boto3
 
 from ...cli.runtime.configuration_manager import ConfigurationManager
-from ...services.ecr import get_account_id, get_region
+from ...utils.aws import get_account_id, get_region
 from ...utils.runtime.config import load_config_if_exists, merge_agent_config, save_config
 from ...utils.runtime.container import ContainerRuntime
 from ...utils.runtime.entrypoint import detect_dependencies

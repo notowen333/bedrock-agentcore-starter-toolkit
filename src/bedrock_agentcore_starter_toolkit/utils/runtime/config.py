@@ -8,6 +8,7 @@ import yaml
 from pydantic import ValidationError
 
 from ...operations.runtime.exceptions import RuntimeToolkitException
+from ...utils.aws import get_account_id, get_region
 from .schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 
 log = logging.getLogger(__name__)
@@ -80,11 +81,15 @@ def load_config(config_path: Path) -> BedrockAgentCoreConfigSchema:
     if _is_legacy_format(data):
         return _transform_legacy_to_multi_agent(data)
 
-    # Add backwards compatibility for missing deployment_type field
+    # Add backwards compatibility for missing deployment_type field and handle missing aws account/region
     if "agents" in data:
         for agent_name, agent_data in data["agents"].items():
+            # If aws details haven't been set, fetch them
+            agent_data["aws"]["account"] = agent_data["aws"]["account"] or get_account_id()
+            agent_data["aws"]["region"] = agent_data["aws"]["region"] or get_region()
+
+            # Default to container for backwards compatibility with existing agents
             if "deployment_type" not in agent_data:
-                # Default to container for backwards compatibility with existing agents
                 agent_data["deployment_type"] = "container"
                 log.info("Using default deployment_type='container' for existing agent '%s'", agent_name)
 

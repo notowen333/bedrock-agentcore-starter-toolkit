@@ -11,42 +11,11 @@ from .configure.resolve import (
     copy_src_implementation_and_docker_config_into_monorepo,
     resolve_agent_config_with_project_context,
 )
-from .constants import RuntimeProtocol, TemplateDirSelection, ModelProvider
+from .constants import ModelProvider, RuntimeProtocol, TemplateDirSelection
 from .features import iac_feature_registry, sdk_feature_registry
-from .types import CreateIACProvider, CreateSDKProvider, ProjectContext, CreateModelProvider
+from .types import CreateIACProvider, CreateModelProvider, CreateSDKProvider, ProjectContext
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
-
-
-def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
-    """Apply baseline and SDK features, collecting dependencies from both.
-
-    This common method handles:
-    1. Creating baseline feature for the template directory
-    2. Collecting python dependencies from baseline and SDK features
-    3. Applying baseline feature (renders pyproject.toml, etc.)
-    4. Applying SDK feature (renders SDK-specific templates)
-    """
-    baseline_feature = BaselineFeature(ctx.template_dir_selection)
-
-    # Collect python dependencies from baseline and SDK
-    deps = set(baseline_feature.python_dependencies)
-    sdk_feature = None
-    if ctx.sdk_provider:
-        # Get SDK feature instance to access its dependencies
-        sdk_feature = sdk_feature_registry[ctx.sdk_provider]()
-        # Call before_appl to ensure dependencies are set correctly based on model provider
-        sdk_feature.before_apply(ctx)
-        deps.update(sdk_feature.python_dependencies)
-
-    ctx.python_dependencies = sorted(deps)
-
-    # Apply baseline feature (renders common templates like pyproject.toml)
-    baseline_feature.apply(ctx)
-
-    # Apply SDK feature (renders SDK-specific templates)
-    if sdk_feature:
-        sdk_feature.apply(ctx)
 
 
 def generate_project(
@@ -67,10 +36,13 @@ def generate_project(
 
     # Validate: IaC (monorepo) only supports Bedrock model provider
     if iac_provider and model_provider and model_provider != ModelProvider.Bedrock:
-        _handle_error("Monorepo (IaC code generation) only supports Bedrock model provider. ", ValueError(
-            f"IaC deployments (monorepo) only support Bedrock model provider. "
-            f"Got: {model_provider}. Use --init (Runtime) for non-Bedrock model providers."
-        ))
+        _handle_error(
+            "Monorepo (IaC code generation) only supports Bedrock model provider. ",
+            ValueError(
+                f"IaC deployments (monorepo) only support Bedrock model provider. "
+                f"Got: {model_provider}. Use --init (Runtime) for non-Bedrock model providers."
+            ),
+        )
 
     # the ProjectContext defines what is generated. It is passed into the jinja templates that are rendered.
     ctx = ProjectContext(
@@ -109,20 +81,62 @@ def generate_project(
         observability_enabled=True,
     )
 
+    # all create projects iac or not get baseline and sdk
+    _apply_baseline_and_sdk_features(ctx)
+
     if not ctx.iac_provider:
-        # Runtime-only path: apply baseline and SDK features
-        _apply_baseline_and_sdk_features(ctx)
         write_minimal_create_runtime_yaml(ctx)
         return
+    else:
+        _apply_iac_generation(ctx, agent_config)
+        write_minimal_create_with_iac_project_yaml(ctx)
+    emit_create_completed_message(ctx)
 
-    # resolve above defaults with the configure context if present
+
+def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
+    """Apply baseline and SDK features, collecting dependencies from both.
+
+    This common method handles:
+    1. Creating baseline feature for the template directory
+    2. Collecting python dependencies from baseline and SDK features
+    3. Applying baseline feature (renders pyproject.toml, etc.)
+    4. Applying SDK feature (renders SDK-specific templates)
+    """
+    baseline_feature = BaselineFeature(ctx.template_dir_selection)
+
+    # Collect python dependencies from baseline and SDK
+    deps = set(baseline_feature.python_dependencies)
+    sdk_feature = None
+    if ctx.sdk_provider:
+        # Get SDK feature instance to access its dependencies
+        sdk_feature = sdk_feature_registry[ctx.sdk_provider]()
+        # Call before_appl to ensure dependencies are set correctly based on model provider
+        sdk_feature.before_apply(ctx)
+        deps.update(sdk_feature.python_dependencies)
+
+    ctx.python_dependencies = sorted(deps)
+
+    # Apply baseline feature (renders common templates like pyproject.toml)
+    baseline_feature.apply(ctx)
+
+    # Apply SDK feature (renders SDK-specific templates)
+    if sdk_feature:
+        sdk_feature.apply(ctx)
+
+
+def _apply_iac_generation(ctx: ProjectContext, agent_config) -> None:
     if agent_config:
         resolve_agent_config_with_project_context(ctx, agent_config)
 
-    # ctx is resolved, ready to start generating
-    # console.print("[cyan] Create generating with the following configuration: [/cyan]")
-    # console.print(Pretty(ctx))
-
+    # Validate: IaC (monorepo) only supports Bedrock model provider
+    if ctx.iac_provider and ctx.model_provider and ctx.model_provider != ModelProvider.Bedrock:
+        _handle_error(
+            "Monorepo (IaC code generation) only supports Bedrock model provider. ",
+            ValueError(
+                f"IaC deployments (monorepo) only support Bedrock model provider. "
+                f"Got: {ctx.model_provider}. Use --init (Runtime) for non-Bedrock model providers."
+            ),
+        )
     if ctx.src_implementation_provided:
         # copy over runtime code and just apply the IAC feature
         if prompt_confirm_continue(
@@ -132,11 +146,11 @@ def generate_project(
             copy_src_implementation_and_docker_config_into_monorepo(agent_config, ctx)
         else:
             _handle_error(message="User stopped create generation.")
-        iac_feature_registry[iac_provider]().apply(ctx)
+        iac_feature_registry[ctx.iac_provider]().apply(ctx)
     else:
         # Monorepo path: apply baseline, SDK, and IAC features
         _apply_baseline_and_sdk_features(ctx)
-        iac_feature_registry[iac_provider]().apply(ctx)
+        iac_feature_registry[ctx.iac_provider]().apply(ctx)
         # create dockerfile
         ContainerRuntime().generate_dockerfile(
             agent_path=ctx.entrypoint_path,
@@ -145,10 +159,3 @@ def generate_project(
             agent_name=ctx.agent_name,
             enable_observability=ctx.observability_enabled,
         )
-    # write a minimal create YAML so commands like agentocore invoke can work later
-    if ctx.iac_provider:
-        write_minimal_create_with_iac_project_yaml(ctx)
-        emit_create_completed_message(ctx)
-    else:
-        # write nearly empty configure YAML
-        pass

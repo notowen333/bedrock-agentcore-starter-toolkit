@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 from ...utils.runtime.config import save_config
-from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
+from ...utils.runtime.schema import AWSConfig, BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..constants import DeploymentType
 from ..types import ProjectContext
 
@@ -23,9 +23,10 @@ def write_minimal_create_with_iac_project_yaml(ctx: ProjectContext) -> Path:
         "agents": {
             agent_name: {
                 "name": agent_name,
-                "entrypoint": str(ctx.src_dir),
+                "entrypoint": str(ctx.entrypoint_path),
                 "deployment_type": ctx.deployment_type,
-                "aws": {"region": None},
+                "source_path": str(ctx.src_dir),
+                "aws": {"account": None, "region": None},
                 "bedrock_agentcore": {
                     "agent_id": None,
                     "agent_arn": None,
@@ -49,6 +50,7 @@ def write_minimal_create_runtime_yaml(ctx: ProjectContext) -> Path:
         deployment_type=DeploymentType.DIRECT_CODE_DEPLOY,
         runtime_type="PYTHON_3_10",  # todo need to decide default here
         source_path=str(ctx.src_dir),
+        aws=AWSConfig(execution_role_auto_create=True, s3_auto_create=True, region=None, account=None),
     )
     schema = BedrockAgentCoreConfigSchema(default_agent=ctx.agent_name, agents={ctx.agent_name: agent_schema})
     save_config(schema, ctx.output_dir / CONFIG_YAML_NAME)

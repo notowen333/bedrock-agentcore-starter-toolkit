@@ -49,16 +49,6 @@ def sanitize_ecr_repo_name(name: str) -> str:
     return name
 
 
-def get_account_id() -> str:
-    """Get AWS account ID."""
-    return boto3.client("sts").get_caller_identity()["Account"]
-
-
-def get_region() -> str:
-    """Get AWS region."""
-    return boto3.Session().region_name or "us-west-2"
-
-
 def create_ecr_repository(repo_name: str, region: str) -> str:
     """Create or get existing ECR repository."""
     ecr = boto3.client("ecr", region_name=region)
