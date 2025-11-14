@@ -1,4 +1,9 @@
-"""Bedrock AgentCore CLI - Command line interface for Bedrock AgentCore."""
+"""Bedrock AgentCore CLI - Command line interface for Bedrock AgentCore.
+
+TODO: This file has grown to 2000+ lines and should be refactored:
+- Split individual commands into separate files (configure_command.py, launch_command.py, invoke_command.py, etc.)
+- Move shared helper functions to common.py
+"""
 
 import json
 import logging
@@ -29,26 +34,11 @@ from ...operations.runtime import (
 from ...utils.runtime.config import load_config
 from ...utils.runtime.logs import get_agent_log_paths, get_aws_tail_commands, get_genai_observability_url
 from ..common import _handle_error, _print_success, console
+from .common import _show_configuration_not_found_panel
 from .configuration_manager import ConfigurationManager
 
 # Create a module-specific logger
 logger = logging.getLogger(__name__)
-
-
-def _show_configuration_not_found_panel():
-    """Show standardized configuration not found panel."""
-    console.print(
-        Panel(
-            "⚠️ [yellow]Configuration Not Found[/yellow]\n\n"
-            "No agent configuration found in this directory.\n\n"
-            "[bold]Get Started:[/bold]\n"
-            "   [cyan]agentcore configure --entrypoint your_agent.py[/cyan]\n"
-            "   [cyan]agentcore launch[/cyan]\n"
-            '   [cyan]agentcore invoke \'{"prompt": "Hello"}\'[/cyan]',
-            title="⚠️ Setup Required",
-            border_style="bright_blue",
-        )
-    )
 
 
 def _validate_requirements_file(file_path: str) -> str:
