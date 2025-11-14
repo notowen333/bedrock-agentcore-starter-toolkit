@@ -9,7 +9,7 @@ import typer
 
 from ...cli.common import _handle_error
 from ...create.generate import generate_project
-from ...create.types import CreateIACProvider, CreateSDKProvider
+from ...create.types import CreateIACProvider, CreateModelProviderProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..cli_ui import ask_choice, ask_text
@@ -38,6 +38,10 @@ runtime_init_option = typer.Option(
     None, "--init", help="Use create to initialize the runtime agent SDK code for a project"
 )
 
+model_provider_option = typer.Option(
+    None, "--model-provider", "-mp", help="Model provider to use with the Agent SDK (Bedrock, OpenAI etc.)"
+)
+
 VALID_SDK = list(CreateSDKProvider.__args__)
 
 
@@ -48,6 +52,7 @@ def create(
     iac: CreateIACProvider = iac_option,
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
+    model_provider: CreateModelProviderProvider = model_provider_option,
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
