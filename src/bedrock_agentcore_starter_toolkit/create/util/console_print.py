@@ -23,9 +23,9 @@ def emit_create_completed_message(ctx: ProjectContext):
     )
 
     next_steps_cmd = (
-        f"`cd {ctx.name}/cdk && npm install && npm run cdk synth && npm run cdk:deploy`"
+        f"cd {ctx.name}/cdk && npm install && npm run cdk synth && npm run cdk:deploy"
         if ctx.iac_provider == IACProvider.CDK
-        else f"`cd {ctx.name}/terraform && terraform init && terraform apply`"
+        else f"cd {ctx.name}/terraform && terraform init && terraform apply"
     )
 
     console.print(

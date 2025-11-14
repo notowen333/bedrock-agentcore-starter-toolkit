@@ -76,7 +76,7 @@ class TestYAMLOutput:
         assert agent_config["deployment_type"] == sample_project_context.deployment_type
 
     def test_yaml_sets_create_flag(self, sample_project_context):
-        """Test that YAML sets is_agentcore_create_project flag to True."""
+        """Test that YAML sets is_agentcore_create_with_iac flag to True."""
         # Ensure output directory exists
         sample_project_context.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -88,8 +88,8 @@ class TestYAMLOutput:
             data = yaml.safe_load(f)
 
         # Verify create flag is set to True
-        assert "is_agentcore_create_project" in data
-        assert data["is_agentcore_create_project"] is True
+        assert "is_agentcore_create_with_iac" in data
+        assert data["is_agentcore_create_with_iac"] is True
 
     def test_yaml_structure_valid(self, sample_project_context):
         """Test that YAML structure is valid and contains all required sections."""
@@ -106,7 +106,7 @@ class TestYAMLOutput:
         # Verify top-level structure
         assert isinstance(data, dict)
         assert "default_agent" in data
-        assert "is_agentcore_create_project" in data
+        assert "is_agentcore_create_with_iac" in data
         assert "agents" in data
 
         # Verify agent structure

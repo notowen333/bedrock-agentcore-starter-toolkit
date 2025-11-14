@@ -150,7 +150,7 @@ resource "aws_cognito_user_pool_client" "cognito_app_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "cognito_domain" {
-  domain       = "${var.app_name}-${data.aws_region.current.region}"
+  domain       = "${lower(var.app_name)}-${data.aws_region.current.region}"
   user_pool_id = aws_cognito_user_pool.cognito_user_pool.id
 }
 

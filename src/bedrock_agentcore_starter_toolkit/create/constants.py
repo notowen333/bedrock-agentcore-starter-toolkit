@@ -8,10 +8,17 @@ This structure is chosen because StrEnum is available in 3.11+ and we need to su
 class TemplateDirSelection:
     """Used to keep track of which directories within templates/ to render."""
 
-    DEFAULT = "default"
+    MONOREPO = "monorepo"
     COMMON = "common"
-    MCP_RUNTIME = "mcp_runtime"
+    MONOREPO_MCP_RUNTIME = "monorepo_mcp_runtime"
     RUNTIME_ONLY = "runtime_only"
+
+
+class DeploymentType:
+    """Deploy with docker or s3 zip."""
+
+    CONTAINER = "container"
+    DIRECT_CODE_DEPLOY = "direct_code_deploy"
 
 
 class RuntimeProtocol:

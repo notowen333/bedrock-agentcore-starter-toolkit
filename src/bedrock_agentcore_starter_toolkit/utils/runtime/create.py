@@ -19,7 +19,7 @@ def resolve_create_project_config() -> BedrockAgentCoreConfigSchema:
     create_project = load_config(config_path)
     default_agent = create_project.default_agent
     default_agent_config = create_project.agents[default_agent]
-    if not create_project.is_agentcore_create_project:
+    if not create_project.is_agentcore_create_with_iac:
         return  # no-op
 
     region = get_region()

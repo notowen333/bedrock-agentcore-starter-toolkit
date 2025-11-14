@@ -1,3 +1,4 @@
+{% autoescape false %}
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -12,3 +13,4 @@ dependencies = [
     "{{ dep }}"{% if not loop.last %},{% endif %}
 {%- endfor %}
 ]
+{%- endautoescape %}

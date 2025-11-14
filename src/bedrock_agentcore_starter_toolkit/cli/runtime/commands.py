@@ -963,7 +963,7 @@ def launch(
 
     # Load config early to determine deployment type for proper messaging
     project_config = load_config(config_path)
-    if project_config.is_agentcore_create_project:
+    if project_config.is_agentcore_create_with_iac:
         _handle_error(
             "Error: cannot launch a project that has been created by agentcore create. Deploy the project via the "
             "chosen iac provider "

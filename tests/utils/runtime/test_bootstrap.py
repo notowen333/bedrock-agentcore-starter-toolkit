@@ -47,7 +47,7 @@ class TestResolveCreateProjectConfig:
                     ),
                 )
             },
-            is_agentcore_create_project=False,  # Not a create project
+            is_agentcore_create_with_iac=False,  # Not a create project
         )
 
         monkeypatch.chdir(tmp_path)
@@ -88,7 +88,7 @@ class TestResolveCreateProjectConfig:
                     ),
                 )
             },
-            is_agentcore_create_project=True,
+            is_agentcore_create_with_iac=True,
         )
 
         monkeypatch.chdir(tmp_path)
@@ -138,7 +138,7 @@ class TestResolveCreateProjectConfig:
                     ),
                 )
             },
-            is_agentcore_create_project=True,
+            is_agentcore_create_with_iac=True,
         )
 
         # Mock the client to return a matching agent
@@ -204,7 +204,7 @@ class TestResolveCreateProjectConfig:
                     ),
                 )
             },
-            is_agentcore_create_project=True,
+            is_agentcore_create_with_iac=True,
         )
 
         # Mock the client to return no matching agents

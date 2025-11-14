@@ -2,6 +2,7 @@ from crewai import Agent, Crew, LLM, Task, Process
 from crewai.tools import tool
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 import os
+from mcp_client.client import get_streamable_http_mcp_client
 
 if os.getenv("LOCAL_DEV") == "1":
     # In local dev, instantiate dummy MCP client so the code runs without deploying
@@ -10,7 +11,6 @@ if os.getenv("LOCAL_DEV") == "1":
     mcp_adapter = nullcontext([])
 else:
     # Import AgentCore Gateway as Streamable HTTP MCP Client
-    from mcp_client.client import get_streamable_http_mcp_client
     mcp_adapter = get_streamable_http_mcp_client()
 
 # Uses global inference profile for Claude Sonnet 4.5
