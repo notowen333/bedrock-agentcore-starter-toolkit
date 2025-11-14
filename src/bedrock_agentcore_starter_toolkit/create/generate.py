@@ -11,7 +11,7 @@ from .configure.resolve import (
     copy_src_implementation_and_docker_config_into_monorepo,
     resolve_agent_config_with_project_context,
 )
-from .constants import RuntimeProtocol, TemplateDirSelection
+from .constants import RuntimeProtocol, TemplateDirSelection, ModelProvider
 from .features import iac_feature_registry, sdk_feature_registry
 from .types import CreateIACProvider, CreateSDKProvider, ProjectContext, CreateModelProvider
 from .util.console_print import emit_create_completed_message
@@ -35,7 +35,7 @@ def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
     if ctx.sdk_provider:
         # Get SDK feature instance to access its dependencies
         sdk_feature = sdk_feature_registry[ctx.sdk_provider]()
-        # Call before_apply to ensure dependencies are set correctly based on model provider
+        # Call before_appl to ensure dependencies are set correctly based on model provider
         sdk_feature.before_apply(ctx)
         deps.update(sdk_feature.python_dependencies)
 
@@ -64,6 +64,13 @@ def generate_project(
     src_path.mkdir(exist_ok=False)
 
     template_dir = TemplateDirSelection.MONOREPO if iac_provider else TemplateDirSelection.RUNTIME_ONLY
+
+    # Validate: IaC (monorepo) only supports Bedrock model provider
+    if iac_provider and model_provider and model_provider != ModelProvider.Bedrock:
+        _handle_error("Monorepo (IaC code generation) only supports Bedrock model provider. ", ValueError(
+            f"IaC deployments (monorepo) only support Bedrock model provider. "
+            f"Got: {model_provider}. Use --init (Runtime) for non-Bedrock model providers."
+        ))
 
     # the ProjectContext defines what is generated. It is passed into the jinja templates that are rendered.
     ctx = ProjectContext(

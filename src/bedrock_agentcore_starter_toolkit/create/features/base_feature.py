@@ -34,7 +34,10 @@ class Feature(ABC):
         else:
             base_path = Path(__file__).parent / self.feature_dir_name.lower() / "templates" / context.template_dir_selection
             # Only append model provider name if it's set (SDK features have it, IaC features don't)
-            if self.model_provider_name:
+            # For monorepo, templates are directly in the template_dir_selection folder (no model provider subdirs)
+            # For runtime_only, templates are in model provider subdirectories
+            from ..constants import TemplateDirSelection
+            if self.model_provider_name and context.template_dir_selection != TemplateDirSelection.MONOREPO:
                 self.template_dir = base_path / self.model_provider_name
             else:
                 self.template_dir = base_path

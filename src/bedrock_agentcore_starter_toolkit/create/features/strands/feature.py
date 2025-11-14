@@ -12,12 +12,20 @@ class StrandsFeature(Feature):
 
     def before_apply(self, context: ProjectContext) -> None:
         """Hook called before template rendering and code generation."""
-        self.model_provider_name = context.model_provider.lower()
-        match context.model_provider:
-            case ModelProvider.Bedrock:
-                self.python_dependencies = ["strands-agents >= 1.13.0", "mcp >= 1.19.0"]
-            case ModelProvider.OpenAI:
-                self.python_dependencies = ["strands-agents[openai] >= 1.13.0", "mcp >= 1.19.0"]
+        from ...constants import TemplateDirSelection
+
+        # For monorepo, only Bedrock is supported (templates don't have model provider subdirs)
+        if context.template_dir_selection == TemplateDirSelection.MONOREPO:
+            self.python_dependencies = ["strands-agents >= 1.13.0", "mcp >= 1.19.0"]
+            # model_provider_name not needed for monorepo (no subdirectories)
+        else:
+            # For runtime_only, set model_provider_name to select correct template subdirectory
+            self.model_provider_name = context.model_provider.lower()
+            match context.model_provider:
+                case ModelProvider.Bedrock:
+                    self.python_dependencies = ["strands-agents >= 1.13.0", "mcp >= 1.19.0"]
+                case ModelProvider.OpenAI:
+                    self.python_dependencies = ["strands-agents[openai] >= 1.13.0", "mcp >= 1.19.0"]
 
 
     def after_apply(self, context: ProjectContext) -> None:
