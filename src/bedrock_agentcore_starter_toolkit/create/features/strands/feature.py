@@ -1,6 +1,6 @@
 """Strands SDK Feature."""
 
-from ...constants import SDKProvider
+from ...constants import SDKProvider, ModelProvider
 from ...types import ProjectContext
 from ..base_feature import Feature
 
@@ -9,11 +9,16 @@ class StrandsFeature(Feature):
     """Implements Strands code generation."""
 
     feature_dir_name = SDKProvider.STRANDS
-    python_dependencies = ["strands-agents >= 1.13.0", "mcp >= 1.19.0"]
 
     def before_apply(self, context: ProjectContext) -> None:
         """Hook called before template rendering and code generation."""
-        pass
+        self.model_provider_name = context.model_provider.lower()
+        match context.model_provider:
+            case ModelProvider.Bedrock:
+                self.python_dependencies = ["strands-agents >= 1.13.0", "mcp >= 1.19.0"]
+            case ModelProvider.OpenAI:
+                self.python_dependencies = ["strands-agents[openai] >= 1.13.0", "mcp >= 1.19.0"]
+
 
     def after_apply(self, context: ProjectContext) -> None:
         """Hook called after template rendering and code generation."""

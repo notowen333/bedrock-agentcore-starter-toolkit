@@ -9,7 +9,7 @@ import typer
 
 from ...cli.common import _handle_error
 from ...create.generate import generate_project
-from ...create.types import CreateIACProvider, CreateModelProviderProvider, CreateSDKProvider
+from ...create.types import CreateIACProvider, CreateSDKProvider, CreateModelProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
 from ..cli_ui import ask_choice, ask_text
@@ -43,6 +43,7 @@ model_provider_option = typer.Option(
 )
 
 VALID_SDK = list(CreateSDKProvider.__args__)
+VALID_MODEL_PROVIDERS = list(CreateModelProvider.__args__)
 
 
 @create_app.callback(invoke_without_command=True)
@@ -52,7 +53,7 @@ def create(
     iac: CreateIACProvider = iac_option,
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
-    model_provider: CreateModelProviderProvider = model_provider_option,
+    model_provider: CreateModelProvider = model_provider_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -82,6 +83,8 @@ def create(
     if runtime_init:
         if not sdk:
             sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+        if not model_provider:
+            model_provider = ask_choice(title="Model Provider: ", choices=VALID_MODEL_PROVIDERS)
         generate_project(project_name, sdk, model_provider=model_provider, iac_provider=None, agent_config=None)
         return
 
@@ -113,6 +116,8 @@ def create(
         sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
     if not iac:
         iac = prompt_iac_provider()
+    if not model_provider:
+        model_provider = ask_choice(title="Model Provider: ", choices=VALID_MODEL_PROVIDERS)
 
     if not configure_yaml.exists():
         # _handle_warn(

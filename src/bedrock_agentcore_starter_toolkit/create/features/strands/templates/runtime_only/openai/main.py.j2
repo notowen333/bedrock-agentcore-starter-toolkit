@@ -1,5 +1,17 @@
 from strands import Agent, tool
+from strands.models.openai import OpenAIModel
 from bedrock_agentcore import BedrockAgentCoreApp
+
+def get_api_key() -> str:
+    # TODO: Implement Workload Identity Stuff and support for local dev server
+    return "API_KEY"
+
+model = OpenAIModel(
+    client_args={
+        "api_key": get_api_key()
+    },
+    model_id="gpt-5",
+)
 
 # Define a simple function tool
 @tool
@@ -12,11 +24,11 @@ app = BedrockAgentCoreApp()
 
 @app.entrypoint
 def invoke(payload):
-    # assume payload input is structured as { "prompt": "<user input>" }
-
-    # The default model provider is Amazon Bedrock and the default model is Claude 4 Sonnet inference model
-    # from the region of your credentials. https://strandsagents.com/latest/documentation/docs/
-    agent = Agent([add_numbers])
+    """
+    Assume payload input is structured as { "prompt": "<user input>" }
+    """
+    # Create an Agent with tools
+    agent = Agent(model=model, tools=[add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")

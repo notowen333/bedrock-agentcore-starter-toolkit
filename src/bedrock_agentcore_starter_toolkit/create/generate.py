@@ -13,16 +13,47 @@ from .configure.resolve import (
 )
 from .constants import RuntimeProtocol, TemplateDirSelection
 from .features import iac_feature_registry, sdk_feature_registry
-from .types import CreateIACProvider, CreateSDKProvider, ProjectContext, CreateModelProviderProvider
+from .types import CreateIACProvider, CreateSDKProvider, ProjectContext, CreateModelProvider
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
+
+
+def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
+    """Apply baseline and SDK features, collecting dependencies from both.
+
+    This common method handles:
+    1. Creating baseline feature for the template directory
+    2. Collecting python dependencies from baseline and SDK features
+    3. Applying baseline feature (renders pyproject.toml, etc.)
+    4. Applying SDK feature (renders SDK-specific templates)
+    """
+    baseline_feature = BaselineFeature(ctx.template_dir_selection)
+
+    # Collect python dependencies from baseline and SDK
+    deps = set(baseline_feature.python_dependencies)
+    sdk_feature = None
+    if ctx.sdk_provider:
+        # Get SDK feature instance to access its dependencies
+        sdk_feature = sdk_feature_registry[ctx.sdk_provider]()
+        # Call before_apply to ensure dependencies are set correctly based on model provider
+        sdk_feature.before_apply(ctx)
+        deps.update(sdk_feature.python_dependencies)
+
+    ctx.python_dependencies = sorted(deps)
+
+    # Apply baseline feature (renders common templates like pyproject.toml)
+    baseline_feature.apply(ctx)
+
+    # Apply SDK feature (renders SDK-specific templates)
+    if sdk_feature:
+        sdk_feature.apply(ctx)
 
 
 def generate_project(
     name: str,
     sdk_provider: CreateSDKProvider,
     iac_provider: CreateIACProvider | None,
-    model_provider: CreateModelProviderProvider | None,
+    model_provider: CreateModelProvider | None,
     agent_config: BedrockAgentCoreAgentSchema | None,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""
@@ -44,6 +75,7 @@ def generate_project(
         iac_dir=None,  # updated when iac is generated
         sdk_provider=sdk_provider,
         iac_provider=iac_provider,
+        model_provider=model_provider,
         deployment_type="container",
         template_dir_selection=template_dir,
         runtime_protocol=RuntimeProtocol.HTTP,
@@ -71,7 +103,8 @@ def generate_project(
     )
 
     if not ctx.iac_provider:
-        sdk_feature_registry[sdk_provider]().apply(ctx)
+        # Runtime-only path: apply baseline and SDK features
+        _apply_baseline_and_sdk_features(ctx)
         write_minimal_create_runtime_yaml(ctx)
         return
 
@@ -94,19 +127,8 @@ def generate_project(
             _handle_error(message="User stopped create generation.")
         iac_feature_registry[iac_provider]().apply(ctx)
     else:
-        baseline_feature = BaselineFeature(ctx.template_dir_selection)
-        # source code python dependencies
-        deps = set(baseline_feature.python_dependencies)
-        if ctx.sdk_provider:
-            deps.update(sdk_feature_registry[sdk_provider]().python_dependencies)
-        ctx.python_dependencies = sorted(deps)
-
-        # render baseline feature
-        baseline_feature.apply(ctx)
-
-        # Render sdk/iac templates
-        if ctx.sdk_provider:
-            sdk_feature_registry[sdk_provider]().apply(ctx)
+        # Monorepo path: apply baseline, SDK, and IAC features
+        _apply_baseline_and_sdk_features(ctx)
         iac_feature_registry[iac_provider]().apply(ctx)
         # create dockerfile
         ContainerRuntime().generate_dockerfile(

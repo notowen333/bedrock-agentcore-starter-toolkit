@@ -1,0 +1,36 @@
+from strands import Agent, tool
+from strands.models import BedrockModel
+from bedrock_agentcore import BedrockAgentCoreApp
+
+model = BedrockModel(model_id="global.anthropic.claude-sonnet-4-20250514-v1:0")
+
+# Define a simple function tool
+@tool
+def add_numbers(a: int, b: int) -> int:
+    """Return the sum of two numbers"""
+    return a+b
+
+# Integrate with Bedrock AgentCore
+app = BedrockAgentCoreApp()
+
+@app.entrypoint
+def invoke(payload):
+    """
+    Assume payload input is structured as { "prompt": "<user input>" }
+    """
+    # Create an Agent with tools
+    agent = Agent(model=model, tools=[add_numbers])
+
+    # Process the user prompt
+    prompt = payload.get("prompt", "What is Agentic AI?")
+
+    # Run the agent
+    response = agent(prompt)
+
+    # Return result
+    return {
+        "response": response
+    }
+
+if __name__ == "__main__":
+    app.run()

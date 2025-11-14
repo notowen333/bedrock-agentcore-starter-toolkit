@@ -48,3 +48,8 @@ class SDKProvider:
     OPENAI_AGENTS = "OpenAIAgents"
     AUTOGEN = "AutoGen"
     CREWAI = "CrewAI"
+
+class ModelProvider:
+    """Supported Model Providers. """
+    OpenAI = "OpenAI"
+    Bedrock = "Bedrock"
