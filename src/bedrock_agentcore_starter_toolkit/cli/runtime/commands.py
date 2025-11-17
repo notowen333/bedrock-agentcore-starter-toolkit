@@ -12,6 +12,7 @@ from pathlib import Path
 from threading import Thread
 from typing import List, Optional
 
+import requests
 import typer
 from rich.panel import Panel
 from rich.syntax import Syntax
@@ -692,6 +693,7 @@ def invoke(
         None, "--bearer-token", "-bt", help="Bearer token for OAuth authentication"
     ),
     local_mode: Optional[bool] = typer.Option(False, "--local", "-l", help="Send request to a running local container"),
+    dev_mode: Optional[bool] = typer.Option(False, "--dev", "-d", help="Send request to local development server"),
     user_id: Optional[str] = typer.Option(None, "--user-id", "-u", help="User id for authorization flows"),
     headers: Optional[str] = typer.Option(
         None,
@@ -702,6 +704,11 @@ def invoke(
 ):
     """Invoke Bedrock AgentCore endpoint."""
     config_path = Path.cwd() / ".bedrock_agentcore.yaml"
+
+    # Handle dev mode - simple HTTP request to development server
+    if dev_mode:
+        _invoke_dev_server(payload)
+        return
 
     try:
         # Load project configuration to check if auth is configured
@@ -1309,3 +1316,41 @@ def destroy(
         _handle_error(f"Destruction failed: {e}", e)
     except Exception as e:
         _handle_error(f"Destruction failed: {e}", e)
+
+
+def _invoke_dev_server(payload: str) -> None:
+    """Invoke local development server with simple HTTP request."""
+    # Try to parse payload as JSON, fallback to wrapping in prompt
+    try:
+        payload_data = json.loads(payload)
+    except json.JSONDecodeError:
+        payload_data = {"prompt": payload}
+
+    url = "http://localhost:8080/invocations"
+
+    try:
+        response = requests.post(url, json=payload_data, headers={"Content-Type": "application/json"}, timeout=30)
+
+        if response.status_code == 200:
+            console.print("[green]✓ Response from dev server:[/green]")
+            response_json = response.json()
+            console.print_json(data=response_json)
+        else:
+            console.print(f"[yellow]Dev server responded with status {response.status_code}[/yellow]")
+            console.print(response.text)
+    except requests.exceptions.ConnectionError:
+        console.print(
+            Panel(
+                "⚠️ [yellow]Development Server Not Found[/yellow]\n\n"
+                "No development server found on http://localhost:8080\n\n"
+                "[bold]Get Started:[/bold]\n"
+                "   [cyan]agentcore create myproject[/cyan]\n"
+                "   [cyan]cd myproject[/cyan]\n"
+                "   [cyan]agentcore dev[/cyan]\n"
+                '   [cyan]agentcore invoke --dev \'{"prompt": "Hello"}\'[/cyan]',
+                title="⚠️ Setup Required",
+                border_style="bright_blue",
+            )
+        )
+    except Exception as e:
+        console.print(f"[red]Error connecting to dev server: {e}[/red]")
