@@ -1,17 +1,26 @@
 from strands import Agent, tool
 from strands.models.openai import OpenAIModel
 from bedrock_agentcore import BedrockAgentCoreApp
+from bedrock_agentcore.identity.auth import requires_api_key
+from dotenv import load_dotenv
 
-def get_api_key() -> str:
-    # TODO: Implement Workload Identity Stuff and support for local dev server
-    return "API_KEY"
+@requires_api_key(provider_name="StrandsOpenAIIdentity_Agent_API_KEY")
+def agentcore_identity_api_key_provider(api_key: str) -> str:
+    return api_key
 
-model = OpenAIModel(
-    client_args={
-        "api_key": get_api_key()
-    },
-    model_id="gpt-5",
-)
+def get_authenticated_model() -> str:
+    if os.getenv("LOCAL_DEV") == "1":
+        load_dotenv()
+        api_key = os.getenv("OPENAI_API_KEY")
+    else:
+        api_key = agentcore_identity_api_key_provider()
+
+    return OpenAIModel(
+        client_args={
+            "api_key": api_key
+        },
+        model_id="gpt-5",
+    )
 
 # Define a simple function tool
 @tool
@@ -28,7 +37,7 @@ def invoke(payload):
     Assume payload input is structured as { "prompt": "<user input>" }
     """
     # Create an Agent with tools
-    agent = Agent(model=model, tools=[add_numbers])
+    agent = Agent(model=get_authenticated_model(), tools=[add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")
