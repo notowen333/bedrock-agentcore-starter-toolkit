@@ -26,7 +26,7 @@ def emit_create_completed_message(ctx: ProjectContext):
                 f"[bold]Next Steps:[/bold]\n"
                 f"[cyan]cd {ctx.name}[/cyan]\n"
                 f"[cyan]agentcore dev[/cyan] - Start local development server\n"
-                f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally'
+                f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally\n'
                 f"[cyan]agentcore launch[/cyan] - Deploy to AWS\n"
                 f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
                 title="Create Success",
@@ -74,7 +74,7 @@ def emit_create_completed_message(ctx: ProjectContext):
             f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n\n"
             f"[bold]Next Steps:[/bold]\n"
             f"[cyan]agentcore dev[/cyan] - Start local development server\n"
-            f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally'
+            f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally\n'
             f"[cyan]{next_steps_cmd}[/cyan]\n"
             f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
             title="Create Success",
