@@ -9,6 +9,32 @@ from ..types import ProjectContext
 
 def emit_create_completed_message(ctx: ProjectContext):
     """Take in the project context and emit a helpful message to console."""
+    if not ctx.iac_provider:
+        console.print(
+            Panel(
+                f"[bold]Agent Details[/bold]\n"
+                f"Agent Name: [cyan]{ctx.agent_name}[/cyan]\n"
+                f"Deployment: [cyan]{ctx.deployment_type}[/cyan]\n"
+                f"\n"
+                f"[bold]Project Details[/bold]\n"
+                f"SDK Provider: [cyan]{ctx.sdk_provider}[/cyan]\n"
+                f"Runtime Entrypoint: [cyan]{ctx.entrypoint_path}[/cyan]\n"
+                f"\n"
+                f"[bold]Configuration[/bold]\n"
+                f"Memory: [cyan]{'Enabled' if ctx.memory_enabled else 'Disabled'}[/cyan]\n"
+                f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n\n"
+                f"[bold]Next Steps:[/bold]\n"
+                f"[cyan]cd {ctx.name}[/cyan]\n"
+                f"[cyan]agentcore dev[/cyan] - Start local development server\n"
+                f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally'
+                f"[cyan]agentcore launch[/cyan] - Deploy to AWS\n"
+                f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
+                title="Create Success",
+                border_style="bright_blue",
+            )
+        )
+        return
+
     # Extract conditional expressions to avoid newlines in f-strings
     gateway_name = (
         ctx.name + "-AgentCoreGateway"
@@ -47,8 +73,10 @@ def emit_create_completed_message(ctx: ProjectContext):
             f"Memory Name: [cyan]{ctx.memory_name if ctx.memory_enabled else 'Memory Disabled'}[/cyan]\n"
             f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n\n"
             f"[bold]Next Steps:[/bold]\n"
+            f"[cyan]agentcore dev[/cyan] - Start local development server\n"
+            f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally'
             f"[cyan]{next_steps_cmd}[/cyan]\n"
-            f"[cyan](after deploying) `agentcore invoke`[/cyan]",
+            f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
             title="Create Success",
             border_style="bright_blue",
         )

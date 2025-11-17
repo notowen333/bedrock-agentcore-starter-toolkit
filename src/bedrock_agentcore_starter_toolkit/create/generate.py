@@ -80,7 +80,6 @@ def generate_project(
         if provider_api_key:
             # Write .env file directly (outside template system for security)
             _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
-        return
     else:
         _apply_iac_generation(ctx, agent_config)
         write_minimal_create_with_iac_project_yaml(ctx)
