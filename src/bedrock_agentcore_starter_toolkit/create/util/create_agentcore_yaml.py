@@ -51,6 +51,7 @@ def write_minimal_create_runtime_yaml(ctx: ProjectContext) -> Path:
         runtime_type="PYTHON_3_10",  # todo need to decide default here
         source_path=str(ctx.src_dir),
         aws=AWSConfig(execution_role_auto_create=True, s3_auto_create=True, region=None, account=None),
+        api_key_env_var_name=ctx.api_key_env_var_name,
     )
     schema = BedrockAgentCoreConfigSchema(default_agent=ctx.agent_name, agents={ctx.agent_name: agent_schema})
     save_config(schema, ctx.output_dir / CONFIG_YAML_NAME)

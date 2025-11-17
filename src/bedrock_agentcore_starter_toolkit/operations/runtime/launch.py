@@ -21,6 +21,7 @@ from ...utils.runtime.create_with_iam_eventual_consistency import retry_create_w
 from ...utils.runtime.entrypoint import build_entrypoint_array
 from ...utils.runtime.logs import get_genai_observability_url
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
+from ...utils.runtime.agentcore_identity import _load_api_key_from_env_if_configured
 from .create_role import get_or_create_runtime_execution_role
 from .exceptions import RuntimeToolkitException
 from .models import LaunchResult
@@ -440,6 +441,25 @@ def _deploy_to_bedrock_agentcore(
         log.info("Passing memory configuration to agent: %s", agent_config.memory.memory_id)
 
     bedrock_agentcore_client = BedrockAgentCoreClient(region)
+
+    # Load API key from .env if configured (for cloud deployments)
+    if agent_config.api_key_env_var_name:
+        project_dir = config_path.parent
+        api_key = _load_api_key_from_env_if_configured(agent_config, project_dir)
+
+        if api_key:
+            # Store API key as API Key Credential Provider in AgentCore Identity
+            log.info("Storing API key in AgentCore Identity")
+            api_key_credential_provider_name = bedrock_agentcore_client.create_or_update_api_key_credential_provider(
+                api_key_credential_provider_name=agent_config.api_key_credential_provider_name,
+                api_key=api_key,
+                agent_name=agent_config.name,
+                key_name=agent_config.api_key_env_var_name
+            )["name"]
+            agent_config.api_key_credential_provider_name=api_key_credential_provider_name
+
+    if agent_config.api_key_credential_provider_name:
+        env_vars["BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME"] = agent_config.api_key_credential_provider_name
 
     # Transform network configuration to AWS API format
     network_config = agent_config.aws.network_configuration.to_aws_dict()
@@ -1155,9 +1175,30 @@ def _launch_with_direct_code_deploy(
         # Prepare environment variables
         if env_vars is None:
             env_vars = {}
+
+        # Load API key from .env if configured
+        if agent_config.api_key_env_var_name:
+            project_dir = config_path.parent
+            api_key = _load_api_key_from_env_if_configured(agent_config, project_dir)
+
+            if api_key:
+                # Store API key as API Key Credential Provider in AgentCore Identity
+                log.info("Storing API key in AgentCore Identity")
+                api_key_credential_provider_name = bedrock_agentcore_client.create_or_update_api_key_credential_provider(
+                    api_key_credential_provider_name=agent_config.api_key_credential_provider_name,
+                    api_key=api_key,
+                    agent_name=agent_config.name,
+                    key_name=agent_config.api_key_env_var_name
+                )["name"]
+                agent_config.api_key_credential_provider_name=api_key_credential_provider_name
+
+        if agent_config.api_key_credential_provider_name:
+            env_vars["BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME"] = agent_config.api_key_credential_provider_name
+
         if agent_config.memory and agent_config.memory.memory_id:
             env_vars["BEDROCK_AGENTCORE_MEMORY_ID"] = agent_config.memory.memory_id
             env_vars["BEDROCK_AGENTCORE_MEMORY_NAME"] = agent_config.memory.memory_name
+
 
         # Build entrypoint array with optional OpenTelemetry instrumentation
         entrypoint_array = build_entrypoint_array(

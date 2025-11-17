@@ -72,6 +72,8 @@ def generate_project(
         request_header_allowlist=None,
         # observability
         observability_enabled=True,
+        # api key authentication
+        api_key_env_var_name=f"{model_provider.upper()}_API_KEY" if model_provider and model_provider != ModelProvider.Bedrock else None,
     )
 
     _apply_baseline_and_sdk_features(ctx)

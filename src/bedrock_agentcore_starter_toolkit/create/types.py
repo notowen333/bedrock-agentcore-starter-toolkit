@@ -59,6 +59,8 @@ class ProjectContext:
     request_header_allowlist: Optional[list[str]]
     # observability (use opentelemetry-instrument at Docker entry CMD)
     observability_enabled: bool
+    # api key authentication
+    api_key_env_var_name: Optional[str]
 
     def dict(self):
         """Return dataclass as dictionary."""
