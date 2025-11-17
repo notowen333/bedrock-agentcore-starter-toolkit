@@ -107,8 +107,17 @@ def _runtime_only_generate(
     """Runtime code generation path."""
     if not sdk:
         sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+    providers_map = ModelProvider.get_providers_for_context(is_runtime_only=True, sdk_provider=sdk)
+    supported_providers = list(providers_map.keys())
+    if not supported_providers:
+        raise typer.BadParameter(f"SDK '{sdk}' is not compatible with any runtime model providers.")
     if not model_provider:
-        model_provider = prompt_model_provider()
+        model_provider = prompt_model_provider(sdk_provider=sdk)
+    if model_provider not in supported_providers:
+        raise typer.BadParameter(
+            f"Model provider '{model_provider}' is not supported for SDK '{sdk}'. "
+            f"Supported providers: {', '.join(supported_providers)}"
+        )
     if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
         provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
 

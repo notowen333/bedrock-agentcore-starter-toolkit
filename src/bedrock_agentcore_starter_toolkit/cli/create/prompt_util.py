@@ -62,16 +62,11 @@ def prompt_iac_provider() -> IACProvider:
     return choice
 
 
-def prompt_model_provider() -> ModelProvider:
+def prompt_model_provider(sdk_provider: str | None = None) -> ModelProvider:
     """Prompt user to choose an LLM model provider."""
     choice = select_one(
         title="Model provider selection:",
-        options={
-            ModelProvider.Bedrock: ("Use Amazon Bedrock to provide LLM inference authenticated with AWS"),
-            ModelProvider.OpenAI: (
-                "Use an OpenAI API key to provide LLM inference. Store the credential in AgentCore Identity."
-            ),
-        },
+        options=ModelProvider.get_providers_for_context(is_runtime_only=True, sdk_provider=sdk_provider),
     )
     return choice
 
