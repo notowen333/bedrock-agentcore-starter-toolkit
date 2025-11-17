@@ -2,7 +2,6 @@
 
 import re
 from pathlib import Path
-from time import sleep
 from typing import Optional
 
 import typer
@@ -93,26 +92,40 @@ def create(
     if runtime_init is None:
         runtime_init = prompt_runtime_or_monorepo() == "Runtime"
 
-    # runtime only path
     if runtime_init:
-        if not sdk:
-            sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
-        if not model_provider:
-            model_provider = prompt_model_provider()
-        if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
-            provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
-        _prompt_configure_if_not_present()
-        generate_project(
-            name=project_name,
-            sdk_provider=sdk,
-            model_provider=model_provider,
-            provider_api_key=provider_api_key,
-            iac_provider=None,
-            agent_config=None,
-        )
-        return
+        _runtime_only_generate(project_name, sdk, model_provider, provider_api_key)
+    else:
+        _monorepo_generate(project_name, sdk, iac, model_provider)
 
-    # iac path
+
+def _runtime_only_generate(
+    project_name: str,
+    sdk: Optional[CreateSDKProvider],
+    model_provider: Optional[CreateModelProvider],
+    provider_api_key: Optional[str],
+):
+    """Runtime code generation path."""
+    if not sdk:
+        sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+    if not model_provider:
+        model_provider = prompt_model_provider()
+    if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
+        provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
+
+    generate_project(
+        name=project_name,
+        sdk_provider=sdk,
+        model_provider=model_provider,
+        provider_api_key=provider_api_key,
+        iac_provider=None,
+        agent_config=None,
+    )
+
+
+def _monorepo_generate(
+    project_name: str, sdk: Optional[CreateSDKProvider], iac: Optional[CreateIACProvider], model_provider: Optional[str]
+):
+    """IAC generation path."""
     # consume config from configure command and perform validations
     configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
     agent_config: BedrockAgentCoreAgentSchema | None = None
@@ -142,10 +155,14 @@ def create(
     if not iac:
         iac = prompt_iac_provider()
 
-    _prompt_configure_if_not_present()
+    # prompt for agentcore configure
+    configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
+    if not configure_yaml.exists():
+        no_title = "No, use default settings"
+        if prompt_configure(no_title) != no_title:
+            configure_impl(create=True)
+        pass
 
-    # Create template project
-    sleep(0.2)
     generate_project(
         name=project_name,
         sdk_provider=sdk,
@@ -154,12 +171,3 @@ def create(
         provider_api_key=None,  # Not supported for IAC until Identity has constructs
         agent_config=agent_config,
     )
-
-
-def _prompt_configure_if_not_present():
-    configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
-    if not configure_yaml.exists():
-        no_title = "No, use default settings"
-        if prompt_configure(no_title) != no_title:
-            configure_impl(create=True)
-        pass
