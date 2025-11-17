@@ -1,0 +1,19 @@
+import os
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+# deepwiki provides context about public GitHub repositories and requires no authentication
+EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/"
+
+def get_streamable_http_mcp_client() -> MultiServerMCPClient:
+    """
+    Returns an MCP Client for AgentCore Gateway compatible with LangGraph
+    """
+    # to use an MCP server that supports bearer authentication, add "headers": {"Authorization": f"Bearer {access_token}"}
+    return MultiServerMCPClient(
+        {
+            "example_endpoint": {
+                "transport": "streamable_http",
+                "url": EXAMPLE_MCP_ENDPOINT,
+            }
+        }
+    )

@@ -26,9 +26,6 @@ def add_numbers(a: int, b: int) -> int:
     """Return the sum of two numbers"""
     return a+b
 
-# Import AgentCore Gateway as Streamable HTTP MCP Adapter
-mcp_adapter = get_streamable_http_mcp_client()
-
 # Integrate with Bedrock AgentCore
 app = BedrockAgentCoreApp()
 

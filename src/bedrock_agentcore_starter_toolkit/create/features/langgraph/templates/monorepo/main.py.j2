@@ -40,7 +40,7 @@ async def invoke(payload):
     tools = await mcp_client.get_tools()
 
     # Define the agent
-    graph = create_agent(llm, tools=[add_numbers] + tools)
+    graph = create_agent(llm, tools=tools + [add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")

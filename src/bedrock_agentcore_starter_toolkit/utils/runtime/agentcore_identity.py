@@ -1,9 +1,13 @@
-from typing import Dict, Optional
-from pathlib import Path
-from .schema import BedrockAgentCoreAgentSchema
+"""Utilities for agentcore identity."""
+
 import logging
+from pathlib import Path
+from typing import Dict, Optional
+
+from .schema import BedrockAgentCoreAgentSchema
 
 log = logging.getLogger(__name__)
+
 
 def _parse_env_file(env_file_path: Path) -> Dict[str, str]:
     """Parse a .env file and return a dictionary of environment variables.
@@ -47,8 +51,8 @@ def _parse_env_file(env_file_path: Path) -> Dict[str, str]:
 
 
 def _load_api_key_from_env_if_configured(
-        agent_config: BedrockAgentCoreAgentSchema,
-        project_dir: Path,
+    agent_config: BedrockAgentCoreAgentSchema,
+    project_dir: Path,
 ) -> Optional[str]:
     """Load API key from .env file if api_key_env_var_name is configured.
 
@@ -95,8 +99,7 @@ def _load_api_key_from_env_if_configured(
         return api_key
     else:
         log.warning(
-            "️ .env file found but %s is not set\n"
-            "   Please add: %s=your_api_key to %s",
+            "️ .env file found but %s is not set\n   Please add: %s=your_api_key to %s",
             env_var_name,
             env_var_name,
             env_file,

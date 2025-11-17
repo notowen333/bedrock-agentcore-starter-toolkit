@@ -25,6 +25,7 @@ class Feature(ABC):
         if not (self.template_override_dir or self.feature_dir_name):
             raise Exception("Without template_override_parent_dir, feature_dir_name must be defined")
         self.template_dir: Optional[Path] = None
+        self.base_path: Optional[Path] = None
         self.model_provider_name: Optional[str] = None
 
     def _resolve_template_dir(self, context: ProjectContext) -> Path:
@@ -32,15 +33,18 @@ class Feature(ABC):
         if self.template_override_dir:
             self.template_dir = self.template_override_dir
         else:
-            base_path = Path(__file__).parent / self.feature_dir_name.lower() / "templates" / context.template_dir_selection
+            self.base_path = (
+                Path(__file__).parent / self.feature_dir_name.lower() / "templates" / context.template_dir_selection
+            )
             # Only append model provider name if it's set (SDK features have it, IaC features don't)
             # For monorepo, templates are directly in the template_dir_selection folder (no model provider subdirs)
             # For runtime_only, templates are in model provider subdirectories
             from ..constants import TemplateDirSelection
+
             if self.model_provider_name and context.template_dir_selection != TemplateDirSelection.MONOREPO:
-                self.template_dir = base_path / self.model_provider_name
+                self.template_dir = self.base_path / self.model_provider_name
             else:
-                self.template_dir = base_path
+                self.template_dir = self.base_path
         if not self.template_dir.exists():
             raise FileNotFoundError(f"Template directory not found: {self.template_dir}")
 
@@ -82,7 +86,14 @@ class Feature(ABC):
 
     def render_dir(self, dest_dir: Path, context: ProjectContext) -> None:
         """Render templates for the variant only (common handled automatically in apply)."""
-        common_dir = self.template_dir.parent / TemplateDirSelection.COMMON
-        if self.render_common_dir and common_dir.exists():
-            self._render_from_template_src_dir(common_dir, dest_dir, context)
+        # Case 1: global 'common' directory
+        if self.base_path:
+            global_common_dir = self.base_path / TemplateDirSelection.COMMON
+            if self.render_common_dir and global_common_dir.exists():
+                self._render_from_template_src_dir(global_common_dir, dest_dir, context)
+
+        # Case 2: feature-local 'common' directory even with the resolved template_dir
+        local_common_dir = self.template_dir.parent / TemplateDirSelection.COMMON
+        if local_common_dir.exists():
+            self._render_from_template_src_dir(local_common_dir, dest_dir, context)
         self._render_from_template_src_dir(self.template_dir, dest_dir, context)

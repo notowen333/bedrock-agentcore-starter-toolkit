@@ -1,5 +1,9 @@
+"""Utilities for dotenv."""
+
 from pathlib import Path
+
 from ...create.constants import ModelProvider
+
 
 def _write_env_file_directly(output_dir: Path, model_provider: str, api_key: str | None) -> None:
     """Write .env file with API key for non-Bedrock providers.

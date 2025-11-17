@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from .constants import TemplateDirSelection
+from .constants import ModelProvider, TemplateDirSelection
 from .features import Feature
 from .types import CreateTemplateDirSelection, ProjectContext
 
@@ -34,7 +34,8 @@ class BaselineFeature(Feature):
 
     def before_apply(self, context):
         """Implement anything that needs to happen before template rendering."""
-        pass
+        if context.model_provider != ModelProvider.Bedrock:
+            self.python_dependencies.append("python-dotenv >= 1.2.1")
 
     def after_apply(self, context):
         """Implement anything that needs to happen after template rendering."""

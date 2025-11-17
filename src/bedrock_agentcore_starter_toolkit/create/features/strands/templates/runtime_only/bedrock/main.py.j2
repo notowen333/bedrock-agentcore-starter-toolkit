@@ -1,6 +1,7 @@
 from strands import Agent, tool
 from strands.models import BedrockModel
 from bedrock_agentcore import BedrockAgentCoreApp
+from mcp_client.client import get_streamable_http_mcp_client
 
 model = BedrockModel(model_id="global.anthropic.claude-sonnet-4-20250514-v1:0")
 

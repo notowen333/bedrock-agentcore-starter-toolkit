@@ -113,22 +113,8 @@ def configure_impl(
     config_path = Path.cwd() / ".bedrock_agentcore.yaml"
     config_manager = ConfigurationManager(config_path, non_interactive)
 
-    # create mode configuration
+    # create mode configuration is only passed by CLI
     create_mode_enabled = create
-    if not non_interactive and not create_mode_enabled:
-        response = (
-            prompt(
-                "Use create mode for a minimal default setup? (yes/no) "
-                "`agentcore create` is also compatible with other configure outputs: "
-            )
-            .strip()
-            .lower()
-        )
-        create_mode_enabled = response in ("y", "yes")
-        if create_mode_enabled:
-            console.print("[cyan]Create mode enabled[/cyan]")
-        else:
-            console.print("[dim]Create mode not enabled[/dim]")
 
     # Interactive entrypoint selection
     if not entrypoint:

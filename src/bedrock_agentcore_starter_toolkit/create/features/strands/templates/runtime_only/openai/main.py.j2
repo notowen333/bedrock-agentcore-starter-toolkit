@@ -3,7 +3,7 @@ from strands.models.openai import OpenAIModel
 from bedrock_agentcore import BedrockAgentCoreApp
 from bedrock_agentcore.identity.auth import requires_api_key
 from dotenv import load_dotenv
-import os
+from mcp_client.client import get_streamable_http_mcp_client
 
 @requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
 def agentcore_identity_api_key_provider(api_key: str) -> str:
@@ -37,19 +37,22 @@ def invoke(payload):
     """
     Assume payload input is structured as { "prompt": "<user input>" }
     """
-    # Create an Agent with tools
-    agent = Agent(model=get_authenticated_model(), tools=[add_numbers])
+    # Create an Agent with MCP tools
+    with strands_mcp_client as mcp_client:
+        tools = mcp_client.list_tools_sync()
 
-    # Process the user prompt
-    prompt = payload.get("prompt", "What is Agentic AI?")
+        agent = Agent(model=get_authenticated_model(), tools=tools + [add_numbers])
 
-    # Run the agent
-    response = agent(prompt)
+        # Process the user prompt
+        prompt = payload.get("prompt", "What is Agentic AI?")
 
-    # Return result
-    return {
-        "response": response
-    }
+        # Run the agent
+        response = agent(prompt)
+
+        # Return result
+        return {
+            "response": response
+        }
 
 if __name__ == "__main__":
     app.run()

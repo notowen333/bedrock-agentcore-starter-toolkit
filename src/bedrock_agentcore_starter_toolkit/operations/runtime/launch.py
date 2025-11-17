@@ -15,13 +15,13 @@ from ...services.codebuild import CodeBuildService
 from ...services.ecr import deploy_to_ecr, get_or_create_ecr_repository
 from ...services.runtime import BedrockAgentCoreClient
 from ...services.xray import enable_transaction_search_if_needed
+from ...utils.runtime.agentcore_identity import _load_api_key_from_env_if_configured
 from ...utils.runtime.config import load_config, save_config
 from ...utils.runtime.container import ContainerRuntime
 from ...utils.runtime.create_with_iam_eventual_consistency import retry_create_with_eventual_iam_consistency
 from ...utils.runtime.entrypoint import build_entrypoint_array
 from ...utils.runtime.logs import get_genai_observability_url
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
-from ...utils.runtime.agentcore_identity import _load_api_key_from_env_if_configured
 from .create_role import get_or_create_runtime_execution_role
 from .exceptions import RuntimeToolkitException
 from .models import LaunchResult
@@ -454,9 +454,9 @@ def _deploy_to_bedrock_agentcore(
                 api_key_credential_provider_name=agent_config.api_key_credential_provider_name,
                 api_key=api_key,
                 agent_name=agent_config.name,
-                key_name=agent_config.api_key_env_var_name
+                key_name=agent_config.api_key_env_var_name,
             )["name"]
-            agent_config.api_key_credential_provider_name=api_key_credential_provider_name
+            agent_config.api_key_credential_provider_name = api_key_credential_provider_name
 
     if agent_config.api_key_credential_provider_name:
         env_vars["BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME"] = agent_config.api_key_credential_provider_name
@@ -1184,13 +1184,15 @@ def _launch_with_direct_code_deploy(
             if api_key:
                 # Store API key as API Key Credential Provider in AgentCore Identity
                 log.info("Storing API key in AgentCore Identity")
-                api_key_credential_provider_name = bedrock_agentcore_client.create_or_update_api_key_credential_provider(
-                    api_key_credential_provider_name=agent_config.api_key_credential_provider_name,
-                    api_key=api_key,
-                    agent_name=agent_config.name,
-                    key_name=agent_config.api_key_env_var_name
-                )["name"]
-                agent_config.api_key_credential_provider_name=api_key_credential_provider_name
+                api_key_credential_provider_name = (
+                    bedrock_agentcore_client.create_or_update_api_key_credential_provider(
+                        api_key_credential_provider_name=agent_config.api_key_credential_provider_name,
+                        api_key=api_key,
+                        agent_name=agent_config.name,
+                        key_name=agent_config.api_key_env_var_name,
+                    )["name"]
+                )
+                agent_config.api_key_credential_provider_name = api_key_credential_provider_name
 
         if agent_config.api_key_credential_provider_name:
             env_vars["BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME"] = agent_config.api_key_credential_provider_name
@@ -1198,7 +1200,6 @@ def _launch_with_direct_code_deploy(
         if agent_config.memory and agent_config.memory.memory_id:
             env_vars["BEDROCK_AGENTCORE_MEMORY_ID"] = agent_config.memory.memory_id
             env_vars["BEDROCK_AGENTCORE_MEMORY_NAME"] = agent_config.memory.memory_name
-
 
         # Build entrypoint array with optional OpenTelemetry instrumentation
         entrypoint_array = build_entrypoint_array(

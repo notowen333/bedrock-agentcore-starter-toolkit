@@ -213,7 +213,8 @@ class BedrockAgentCoreAgentSchema(BaseModel):
     request_header_configuration: Optional[dict] = Field(default=None, description="Request header configuration")
     oauth_configuration: Optional[dict] = Field(default=None, description="Oauth configuration")
     api_key_env_var_name: Optional[str] = Field(
-        default=None, description="Environment variable name for API key (e.g., 'OPENAI_API_KEY' for non-Bedrock providers)"
+        default=None,
+        description="Environment variable name for API key (e.g., 'OPENAI_API_KEY' for non-Bedrock providers)",
     )
     api_key_credential_provider_name: Optional[str] = Field(
         default=None, description="Name of the API Key Credential Provider created in AgentCore Identity"

@@ -153,7 +153,7 @@ def select_one(title: str, options: dict[str, str], default: str | None = None):
     )
 
     result = app.run()
-    _pause_on_finish()
+    _pause_and_new_line_on_finish()
     return result
 
 
@@ -213,7 +213,7 @@ def ask_text(title: str, default: str | None = None, redact: bool = False) -> st
     )
 
     result = app.run()
-    _pause_on_finish()
+    _pause_and_new_line_on_finish()
     return result
 
 
@@ -301,7 +301,7 @@ def ask_choice(title: str, choices: list[str]) -> str | None:
     )
 
     result = app.run()
-    _pause_on_finish()
+    _pause_and_new_line_on_finish()
     return result
 
 
@@ -363,10 +363,10 @@ def show_welcome(title: str, description: list[str]) -> None:
     )
 
     app.run()
-    _pause_on_finish()
+    _pause_and_new_line_on_finish()
 
 
-def _pause_on_finish():
+def _pause_and_new_line_on_finish():
     """Sleep and print a line for polish after a command finishes."""
     sleep(0.10)
     print()

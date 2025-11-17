@@ -63,7 +63,7 @@ class ModelProvider:
         "Bedrock": "Use Amazon Bedrock to provide LLM inference authenticated with AWS",
         "OpenAI": "Use an OpenAI API key to provide LLM inference. Store the credential in AgentCore Identity.",
         "Anthropic": "Foundational models from Anthropic. Store the credential in AgentCore Identity.",
-        "Gemini": "Foundational models from Google. Store the credential in AgentCore Identity."
+        "Gemini": "Foundational models from Google. Store the credential in AgentCore Identity.",
     }
 
     # Which providers support which deployment types
