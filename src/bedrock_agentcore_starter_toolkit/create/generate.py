@@ -54,7 +54,8 @@ def generate_project(
         src_implementation_provided=False,
         agent_name=name + "_Agent",
         # memory
-        memory_enabled=True,
+        # TODO: Consider refactoring ProjectContext
+        memory_enabled=True if iac_provider else False,
         memory_name=name + "_Memory",
         memory_event_expiry_days=30,
         memory_is_long_term=False,
@@ -76,6 +77,7 @@ def generate_project(
     _apply_baseline_and_sdk_features(ctx)
 
     if not ctx.iac_provider:
+        ctx.memory_enabled = False
         write_minimal_create_runtime_yaml(ctx)
         if provider_api_key:
             # Write .env file directly (outside template system for security)

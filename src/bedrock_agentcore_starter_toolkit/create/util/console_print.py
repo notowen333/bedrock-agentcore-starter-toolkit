@@ -28,7 +28,7 @@ def emit_create_completed_message(ctx: ProjectContext):
                 f"[cyan]agentcore dev[/cyan] - Start local development server\n"
                 f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally\n'
                 f"[cyan]agentcore launch[/cyan] - Deploy to AWS\n"
-                f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
+                f"[cyan]agentcore invoke[/cyan] - Test your deployed agent",
                 title="Create Success",
                 border_style="bright_blue",
             )
@@ -76,7 +76,7 @@ def emit_create_completed_message(ctx: ProjectContext):
             f"[cyan]agentcore dev[/cyan] - Start local development server\n"
             f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally\n'
             f"[cyan]{next_steps_cmd}[/cyan]\n"
-            f'[cyan]agentcore invoke"[/cyan] - Test your deployed agent',
+            f"[cyan]agentcore invoke[/cyan] - Test your deployed agent",
             title="Create Success",
             border_style="bright_blue",
         )
