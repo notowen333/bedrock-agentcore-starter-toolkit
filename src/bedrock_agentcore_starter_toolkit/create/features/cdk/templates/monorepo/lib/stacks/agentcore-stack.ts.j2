@@ -288,6 +288,7 @@ export class AgentCoreStack extends cdk.Stack {
             },
             roleArn: runtimeRole.roleArn,
             environmentVariables: {
+                "AWS_REGION": region,
                 {%- if not src_implementation_provided %}
                 "GATEWAY_URL": this.agentCoreGateway.attrGatewayUrl,
                 {%- endif %}{% if memory_enabled %}

@@ -433,6 +433,7 @@ resource "aws_bedrockagentcore_agent_runtime" "agentcore_runtime" {
   {%- endif %}
   {%- if memory_enabled or not src_implementation_provided %}
   environment_variables = {
+    AWS_REGION = data.aws_region.current.region
     {%- if memory_enabled %}
     MEMORY_ID = aws_bedrockagentcore_memory.agentcore_memory.id
     {%- endif %}

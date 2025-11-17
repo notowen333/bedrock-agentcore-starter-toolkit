@@ -134,6 +134,10 @@ resource "aws_bedrockagentcore_agent_runtime" "agentcore_runtime" {
     }{% endif %}
   }
 
+  environment_variables = {
+    AWS_REGION = data.aws_region.current.region
+  }
+
  {% if custom_authorizer_enabled %}
   authorizer_configuration {
     custom_jwt_authorizer {
