@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .constants import ModelProvider, TemplateDirSelection
 from .features import Feature
-from .types import CreateTemplateDirSelection, ProjectContext
+from .types import ProjectContext
 
 
 class BaselineFeature(Feature):
@@ -13,10 +13,10 @@ class BaselineFeature(Feature):
     Pass in the directory you want to read in. i.e. default/common/mcp.
     """
 
-    def __init__(self, template_dir_name: CreateTemplateDirSelection):
+    def __init__(self, ctx: ProjectContext):
         """Initialise the template directory and minimum dependencies required for a Create project."""
-        self.template_override_dir = Path(__file__).parent / "templates" / template_dir_name
-        match template_dir_name:
+        self.template_override_dir = Path(__file__).parent / "templates" / ctx.template_dir_name
+        match ctx.template_dir_name:
             case TemplateDirSelection.MONOREPO:
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",
@@ -30,6 +30,8 @@ class BaselineFeature(Feature):
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",
                 ]
+        if ctx.model_provider != ModelProvider.Bedrock:
+            self.python_dependencies.append("python-dotenv >= 1.2.1")
         super().__init__()
 
     def before_apply(self, context):

@@ -101,7 +101,7 @@ def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
     3. Applying baseline feature (renders pyproject.toml, etc.)
     4. Applying SDK feature (renders SDK-specific templates)
     """
-    baseline_feature = BaselineFeature(ctx.template_dir_selection)
+    baseline_feature = BaselineFeature(ctx)
 
     # Collect python dependencies from baseline and SDK
     deps = set(baseline_feature.python_dependencies)
@@ -112,9 +112,6 @@ def _apply_baseline_and_sdk_features(ctx: ProjectContext) -> None:
         # Call before_apply to ensure dependencies are set correctly based on model provider
         sdk_feature.before_apply(ctx)
         deps.update(sdk_feature.python_dependencies)
-
-    if ctx.model_provider != ModelProvider.Bedrock:
-        deps.add("python-dotenv >= 1.2.1")
 
     ctx.python_dependencies = sorted(deps)
 
