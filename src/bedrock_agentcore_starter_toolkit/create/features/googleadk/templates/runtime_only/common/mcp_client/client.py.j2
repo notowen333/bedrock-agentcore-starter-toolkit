@@ -1,16 +1,16 @@
 import os
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset
+from google.adk.tools.mcp_tool.mcp_toolset import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 
 # deepwiki provides context about public GitHub repositories and requires no authentication
 EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/mcp"
 
-def get_streamable_http_mcp_client() -> MCPToolset:
+def get_streamable_http_mcp_client() -> McpToolset:
     """
     Returns an MCP Toolset compatible with Google ADK
     """
     # to use an MCP server that supports bearer authentication, add headers={"Authorization": f"Bearer {access_token}"}
-    return MCPToolset(
+    return McpToolset(
         connection_params=StreamableHTTPConnectionParams(
             url=EXAMPLE_MCP_ENDPOINT,
         )
