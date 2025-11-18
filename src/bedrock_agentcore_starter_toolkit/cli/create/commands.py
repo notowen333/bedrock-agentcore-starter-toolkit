@@ -15,7 +15,6 @@ from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCor
 from ..cli_ui import ask_choice_with_default, ask_text
 from ..runtime.commands import configure_impl
 from .prompt_util import (
-    ask_text_required,
     get_auto_generated_project_name,
     prompt_configure,
     prompt_iac_provider,
@@ -120,7 +119,7 @@ def _runtime_only_generate(
             f"Supported providers: {', '.join(supported_providers)}"
         )
     if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
-        provider_api_key = ask_text_required(f"{model_provider} API Key: ", redact=True)
+        provider_api_key = ask_text(f"{model_provider} API Key: (empty to provide in .env later)", redact=True)
 
     generate_project(
         name=project_name,
