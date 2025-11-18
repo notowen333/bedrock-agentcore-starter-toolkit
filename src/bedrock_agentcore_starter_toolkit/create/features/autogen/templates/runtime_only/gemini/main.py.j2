@@ -1,0 +1,60 @@
+import os
+from autogen_agentchat.agents import AssistantAgent
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from autogen_core.tools import FunctionTool
+from autogen_core.models import ModelInfo, ModelFamily
+from mcp_client.client import get_streamable_http_mcp_tools
+from bedrock_agentcore.identity.auth import requires_api_key
+from dotenv import load_dotenv
+
+@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
+def agentcore_identity_api_key_provider(api_key: str) -> str:
+    return api_key
+
+def get_authenticated_model() -> OpenAIChatCompletionClient:
+    if os.getenv("LOCAL_DEV") == "1":
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY")
+    else:
+        api_key = agentcore_identity_api_key_provider()
+
+    return OpenAIChatCompletionClient(model="gemini-2.5-flash", api_key=api_key)
+
+
+# Define a simple function tool
+def add_numbers(a: int, b: int) -> int:
+    """Return the sum of two numbers"""
+    return a+b
+add_numbers_function_tool = FunctionTool(add_numbers, description="Return the sum of two numbers")
+
+# Integrate with Bedrock AgentCore
+app = BedrockAgentCoreApp()
+
+@app.entrypoint
+async def main(payload):
+    # assume payload input is structured as { "prompt": "<user input>" }
+
+    # Import AgentCore Gateway tools as Streamable HTTP MCP Tools
+    tools = await get_streamable_http_mcp_tools()
+
+    # Define an AssistantAgent with the model and tool
+    agent = AssistantAgent(
+        name="{{ agent_name }}",
+        model_client=get_authenticated_model(),
+        tools=[add_numbers_function_tool] + tools,
+        system_message="You are a helpful assistant."
+    )
+
+    # Process the user prompt
+    prompt = payload.get("prompt", "What is Agentic AI?")
+
+    # Run the agent
+    result = await agent.run(task=prompt)
+
+    # Return result
+    return {"result": result.messages[-1].content}
+
+
+if __name__ == "__main__":
+    app.run()
