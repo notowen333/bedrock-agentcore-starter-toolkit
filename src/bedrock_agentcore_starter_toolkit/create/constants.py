@@ -91,9 +91,8 @@ class ModelProvider:
         """Resolve the context to a model provider selection."""
         available = cls.RUNTIME_ONLY_SUPPORTED if is_runtime_only else cls.MONOREPO_SUPPORTED
 
-        if is_runtime_only and sdk_provider:
-            runtime_map = cls.SDK_COMPATIBILITY.get("runtime_only", {})
-            sdk_support = runtime_map.get(sdk_provider)
+        if sdk_provider:
+            sdk_support = cls.SDK_COMPATIBILITY.get(sdk_provider)
             if sdk_support:
                 available = available & sdk_support
 

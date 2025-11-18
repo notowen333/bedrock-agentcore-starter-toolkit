@@ -69,7 +69,7 @@ def _migrate_deployment_type(config: BedrockAgentCoreConfigSchema) -> None:
         # runtime_type is optional for direct_code_deploy deployments (will default to PYTHON_3_11 in service layer)
 
 
-def load_config(config_path: Path) -> BedrockAgentCoreConfigSchema:
+def load_config(config_path: Path, autofill_missing_aws=True) -> BedrockAgentCoreConfigSchema:
     """Load config with automatic legacy format transformation and migration."""
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration not found: {config_path}")
@@ -85,8 +85,9 @@ def load_config(config_path: Path) -> BedrockAgentCoreConfigSchema:
     if "agents" in data:
         for agent_name, agent_data in data["agents"].items():
             # If aws details haven't been set, fetch them
-            agent_data["aws"]["account"] = agent_data["aws"]["account"] or get_account_id()
-            agent_data["aws"]["region"] = agent_data["aws"]["region"] or get_region()
+            if autofill_missing_aws:
+                agent_data["aws"]["account"] = agent_data["aws"]["account"] or get_account_id()
+                agent_data["aws"]["region"] = agent_data["aws"]["region"] or get_region()
 
             # Default to container for backwards compatibility with existing agents
             if "deployment_type" not in agent_data:

@@ -85,7 +85,7 @@ def _get_module_path_and_agent_name(config_path: Path, agent: Optional[str]) -> 
         return DEFAULT_MODULE_PATH, "default"
 
     try:
-        project_config = load_config(config_path)
+        project_config = load_config(config_path, autofill_missing_aws=False)
         agent_config = project_config.get_agent_config(agent)
         module_path = _get_module_path_from_config(config_path, agent_config)
         return module_path, agent_config.name
