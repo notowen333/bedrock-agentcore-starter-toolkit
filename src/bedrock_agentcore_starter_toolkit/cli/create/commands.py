@@ -54,6 +54,10 @@ model_provider_api_key_option = typer.Option(
     None, "--provider-api-key", "-key", help="API key for the model provider (required for non-Bedrock providers)"
 )
 
+non_interactive_flag = typer.Option(
+    False, "--non-interactive", help="Run the agentcore create command in non-interactive mode"
+)
+
 venv_option = typer.Option(
     True,
     "--venv/--no-venv",
@@ -73,13 +77,15 @@ def create(
     runtime_init: bool = runtime_init_option,
     model_provider: CreateModelProvider = model_provider_option,
     provider_api_key: Optional[str] = model_provider_api_key_option,
-    venv_option: bool = venv_option,
+    non_interactive_flag: Optional[bool] = non_interactive_flag,
+    venv_option: bool = venv_option
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
         return
     # welcome command
-    show_create_welcome()
+    if not non_interactive_flag:
+        show_create_welcome()
 
     if not project_name:
         project_name = ask_text(title="Project Name (alphanumeric):", default=get_auto_generated_project_name())
