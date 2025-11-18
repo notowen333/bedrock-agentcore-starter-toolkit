@@ -1,5 +1,7 @@
 """Utility functions for interactive CLI prompts with validation and confirmation."""
 
+import random
+
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
@@ -123,3 +125,38 @@ def prompt_confirm_continue(warn_str: str) -> bool:
     """Display a warning and ask user for confirmation to proceed."""
     response = prompt(HTML(f"<ansiyellow><b>⚠ {warn_str}: Do you want to continue [y/N]: </b></ansiyellow>")).strip()
     return response.lower() in {"y", "yes"}
+
+
+def get_auto_generated_project_name() -> str:
+    """Auto gen a valid project name."""
+    adjectives = [
+        "echo",
+        "bravo",
+        "delta",
+        "astro",
+        "atomic",
+        "rapid",
+        "hyper",
+        "neo",
+        "ultra",
+        "nova",
+    ]
+
+    colors = [
+        "red",
+        "blue",
+        "cyan",
+        "lime",
+        "teal",
+        "gray",
+        "navy",
+        "aqua",
+        "ivory",
+        "amber",
+    ]
+
+    a = random.choice(adjectives)
+    c = random.choice(colors)
+
+    # camelCase: adjective + CapitalizedColor
+    return f"{a}{c.capitalize()}"

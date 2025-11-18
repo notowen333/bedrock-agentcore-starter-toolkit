@@ -3,6 +3,7 @@
 import string
 from time import sleep
 
+from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.application import Application
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.completion import WordCompleter
@@ -172,6 +173,8 @@ def ask_text(title: str, default: str | None = None, redact: bool = False) -> st
         wrap_lines=False,
         password=redact,
     )
+    # set cursor even with default text
+    field.buffer.cursor_position = len(field.text)
 
     kb = KeyBindings()
 
@@ -242,6 +245,9 @@ def ask_choice(title: str, choices: list[str]) -> str | None:
     @kb.add("enter")
     def _(ev):
         entered = buf.text.strip()
+        if entered == "":
+            ev.app.exit(result=None)
+            return
         for c in choices:
             if entered.lower() == c.lower():
                 ev.app.exit(result=c)
@@ -302,6 +308,17 @@ def ask_choice(title: str, choices: list[str]) -> str | None:
 
     result = app.run()
     _pause_and_new_line_on_finish()
+    return result
+
+
+def ask_choice_with_default(title: str, choices: list[str], empty_default_choice: str) -> str:
+    """Wrapper around ask_choice to default no imput."""
+    result = ask_choice(title, choices)
+    if not result:
+        print_formatted_text(HTML(f"<ansigray>No input so using default option: {empty_default_choice}</ansigray>"))
+        print()
+        _pause_and_new_line_on_finish(sleep_override=0.5)
+        return empty_default_choice
     return result
 
 
@@ -366,7 +383,7 @@ def show_welcome(title: str, description: list[str]) -> None:
     _pause_and_new_line_on_finish()
 
 
-def _pause_and_new_line_on_finish():
+def _pause_and_new_line_on_finish(sleep_override: float | None = None):
     """Sleep and print a line for polish after a command finishes."""
-    sleep(0.10)
+    sleep(sleep_override or 0.10)
     print()

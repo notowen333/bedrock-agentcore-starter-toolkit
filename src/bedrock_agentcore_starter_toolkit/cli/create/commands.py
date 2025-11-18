@@ -7,15 +7,16 @@ from typing import Optional
 import typer
 
 from ...cli.common import _handle_error
-from ...create.constants import ModelProvider
+from ...create.constants import ModelProvider, SDKProvider
 from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateModelProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
-from ..cli_ui import ask_choice, ask_text
+from ..cli_ui import ask_choice_with_default, ask_text
 from ..runtime.commands import configure_impl
 from .prompt_util import (
     ask_text_required,
+    get_auto_generated_project_name,
     prompt_configure,
     prompt_iac_provider,
     prompt_model_provider,
@@ -75,7 +76,7 @@ def create(
     show_create_welcome()
 
     if not project_name:
-        project_name = ask_text(title="Project Name (alphanumeric):")
+        project_name = ask_text(title="Project Name (alphanumeric):", default=get_auto_generated_project_name())
 
     # Input Validation
     if not VALID_PROJECT_NAME_PATTERN.fullmatch(project_name):
@@ -106,7 +107,7 @@ def _runtime_only_generate(
 ):
     """Runtime code generation path."""
     if not sdk:
-        sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+        sdk = ask_choice_with_default(title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS)
     providers_map = ModelProvider.get_providers_for_context(is_runtime_only=True, sdk_provider=sdk)
     supported_providers = list(providers_map.keys())
     if not supported_providers:
@@ -158,7 +159,7 @@ def _monorepo_generate(
     # Interactively accept IAC/SDK if not provided
     # entrypoint provided != . means src is provided and we don't need sdk
     if not sdk and (not agent_config or agent_config.entrypoint == "."):
-        sdk = ask_choice(title="Agent SDK:", choices=VALID_SDK)
+        sdk = ask_choice_with_default(title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS)
         model_provider = prompt_model_provider()
 
     if not iac:
