@@ -1,9 +1,10 @@
+import os
 from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import tool
 from bedrock_agentcore import BedrockAgentCoreApp
-from mcp_client.client import get_streamable_http_mcp_client as get_tools
+from mcp_client.client import get_streamable_http_mcp_client
 from bedrock_agentcore.identity.auth import requires_api_key
 from dotenv import load_dotenv
 
@@ -11,7 +12,12 @@ from dotenv import load_dotenv
 def agentcore_identity_api_key_provider(api_key: str) -> str:
     return api_key
 
-def get_authenticated_model() -> str:
+def get_authenticated_model() -> ChatGoogleGenerativeAI:
+    """
+    Get authenticated Gemini model client.
+    Uses AgentCore Identity for API key management in deployed environments,
+    and falls back to .env file for local development.
+    """
     if os.getenv("LOCAL_DEV") == "1":
         load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
@@ -43,7 +49,7 @@ async def invoke(payload):
     tools = await mcp_client.get_tools()
 
     # Define the agent
-    graph = create_agent(llm, tools=tools + [add_numbers])
+    graph = create_agent(get_authenticated_model(), tools=tools + [add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")

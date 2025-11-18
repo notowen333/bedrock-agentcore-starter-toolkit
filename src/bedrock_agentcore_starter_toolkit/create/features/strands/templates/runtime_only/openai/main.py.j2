@@ -10,7 +10,12 @@ from mcp_client.client import get_streamable_http_mcp_client
 def agentcore_identity_api_key_provider(api_key: str) -> str:
     return api_key
 
-def get_authenticated_model() -> str:
+def get_authenticated_model() -> OpenAIModel:
+    """
+    Get authenticated OpenAI model client.
+    Uses AgentCore Identity for API key management in deployed environments,
+    and falls back to .env file for local development.
+    """
     if os.getenv("LOCAL_DEV") == "1":
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
@@ -30,6 +35,9 @@ def add_numbers(a: int, b: int) -> int:
     """Return the sum of two numbers"""
     return a+b
 
+# Import AgentCore Gateway as Streamable HTTP MCP Client
+mcp_client = get_streamable_http_mcp_client()
+
 # Integrate with Bedrock AgentCore
 app = BedrockAgentCoreApp()
 
@@ -39,8 +47,8 @@ def invoke(payload):
     Assume payload input is structured as { "prompt": "<user input>" }
     """
     # Create an Agent with MCP tools
-    with strands_mcp_client as mcp_client:
-        tools = mcp_client.list_tools_sync()
+    with mcp_client as client:
+        tools = client.list_tools_sync()
 
         agent = Agent(model=get_authenticated_model(), tools=tools + [add_numbers])
 

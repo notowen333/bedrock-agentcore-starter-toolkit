@@ -4,7 +4,7 @@ from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 from langchain.tools import tool
 from bedrock_agentcore import BedrockAgentCoreApp
-from mcp_client.client import get_streamable_http_mcp_client as get_tools
+from mcp_client.client import get_streamable_http_mcp_client
 from bedrock_agentcore.identity.auth import requires_api_key
 from dotenv import load_dotenv
 
@@ -12,7 +12,12 @@ from dotenv import load_dotenv
 def agentcore_identity_api_key_provider(api_key: str) -> str:
     return api_key
 
-def get_authenticated_model() -> str:
+def get_authenticated_model() -> ChatOpenAI:
+    """
+    Get authenticated OpenAI model client.
+    Uses AgentCore Identity for API key management in deployed environments,
+    and falls back to .env file for local development.
+    """
     if os.getenv("LOCAL_DEV") == "1":
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")

@@ -4,7 +4,7 @@ from langchain.agents import create_agent
 from langchain_anthropic import ChatAnthropic
 from langchain.tools import tool
 from bedrock_agentcore import BedrockAgentCoreApp
-from mcp_client.client import get_streamable_http_mcp_client as get_tools
+from mcp_client.client import get_streamable_http_mcp_client
 from bedrock_agentcore.identity.auth import requires_api_key
 from dotenv import load_dotenv
 
@@ -12,7 +12,12 @@ from dotenv import load_dotenv
 def agentcore_identity_api_key_provider(api_key: str) -> str:
     return api_key
 
-def get_authenticated_model() -> str:
+def get_authenticated_model() -> ChatAnthropic:
+    """
+    Get authenticated Anthropic model client.
+    Uses AgentCore Identity for API key management in deployed environments,
+    and falls back to .env file for local development.
+    """
     if os.getenv("LOCAL_DEV") == "1":
         load_dotenv()
         api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -23,7 +28,6 @@ def get_authenticated_model() -> str:
         model="claude-sonnet-4-5-20250929",
         api_key=api_key
     )
-
 
 # Define a simple function tool
 @tool
@@ -45,7 +49,7 @@ async def invoke(payload):
     tools = await mcp_client.get_tools()
 
     # Define the agent
-    graph = create_agent(llm, tools=tools + [add_numbers])
+    graph = create_agent(get_authenticated_model(), tools=tools + [add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")

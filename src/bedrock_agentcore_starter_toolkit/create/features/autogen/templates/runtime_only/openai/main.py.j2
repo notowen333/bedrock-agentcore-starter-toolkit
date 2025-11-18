@@ -1,6 +1,6 @@
 import os
 from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models.anthropic import OpenAIChatCompletionClient
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from autogen_core.tools import FunctionTool
 from autogen_core.models import ModelInfo, ModelFamily
@@ -13,6 +13,11 @@ def agentcore_identity_api_key_provider(api_key: str) -> str:
     return api_key
 
 def get_authenticated_model() -> OpenAIChatCompletionClient:
+    """
+    Get authenticated OpenAI model client.
+    Uses AgentCore Identity for API key management in deployed environments,
+    and falls back to .env file for local development.
+    """
     if os.getenv("LOCAL_DEV") == "1":
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
