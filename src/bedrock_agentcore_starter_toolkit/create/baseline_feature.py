@@ -15,8 +15,8 @@ class BaselineFeature(Feature):
 
     def __init__(self, ctx: ProjectContext):
         """Initialise the template directory and minimum dependencies required for a Create project."""
-        self.template_override_dir = Path(__file__).parent / "templates" / ctx.template_dir_name
-        match ctx.template_dir_name:
+        self.template_override_dir = Path(__file__).parent / "templates" / ctx.template_dir_selection
+        match ctx.template_dir_selection:
             case TemplateDirSelection.MONOREPO:
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",

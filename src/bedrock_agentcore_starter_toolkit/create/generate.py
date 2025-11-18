@@ -17,6 +17,7 @@ from .types import CreateIACProvider, CreateModelProvider, CreateSDKProvider, Pr
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
 from .util.dotenv import _write_env_file_directly
+from .util.post_generate_venv import create_and_init_venv
 
 
 def generate_project(
@@ -89,6 +90,7 @@ def generate_project(
     else:
         _apply_iac_generation(ctx, agent_config)
         write_minimal_create_with_iac_project_yaml(ctx)
+    create_and_init_venv(ctx)
     emit_create_completed_message(ctx)
 
 
