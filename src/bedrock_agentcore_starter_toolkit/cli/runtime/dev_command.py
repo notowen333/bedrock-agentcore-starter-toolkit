@@ -197,7 +197,6 @@ def _validate_entrypoint_module(module_path: str, env: dict) -> None:
     entrypoint_module = module_path.split(":")[0]  # Extract 'src.main' from 'src.main:app'
 
     _check_entrypoint_file_exists(entrypoint_module)
-    _check_entrypoint_dependencies(entrypoint_module, env)
     console.print(f"[green]✓ Entrypoint module '{entrypoint_module}' validated successfully[/green]")
 
 
@@ -208,36 +207,6 @@ def _check_entrypoint_file_exists(entrypoint_module: str) -> None:
         _handle_error(
             f"Entrypoint file not found: {file_path}\nCreate this file with an 'app' variable containing your agent."
         )
-
-
-def _check_entrypoint_dependencies(entrypoint_module: str, env: dict) -> None:
-    """Check if the entrypoint module dependencies are satisfied by attempting import.
-
-    This catches all dependency issues that would prevent uvicorn from starting:
-    - Missing packages, version conflicts, syntax errors, missing env vars, etc.
-    """
-    try:
-        result = subprocess.run(
-            ["uv", "run", "python", "-c", f"import {entrypoint_module}"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            env=env,
-        )
-        if result.returncode != 0:
-            error_lines = result.stderr.strip().split("\n")
-            actual_error = error_lines[-1] if error_lines else "Unknown import error"
-
-            # Check if there's a pyproject.toml in src/ directory
-            src_pyproject = Path("src/pyproject.toml")
-            install_cmd = "uv pip install -e src/" if src_pyproject.exists() else "uv pip install -e ."
-
-            _handle_error(
-                f"Dependency error: {actual_error}\n"
-                f"Run '{install_cmd}' to install project dependencies from pyproject.toml"
-            )
-    except subprocess.TimeoutExpired:
-        _handle_error(f"Timeout while validating entrypoint module '{entrypoint_module}'")
 
 
 def _check_uvicorn_available() -> None:
