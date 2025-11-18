@@ -2,7 +2,7 @@ import os
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 # deepwiki provides context about public GitHub repositories and requires no authentication
-EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/"
+EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/mcp"
 
 def get_streamable_http_mcp_client() -> MultiServerMCPClient:
     """

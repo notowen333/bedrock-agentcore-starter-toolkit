@@ -3,7 +3,7 @@ from typing import List
 from autogen_ext.tools.mcp import StreamableHttpMcpToolAdapter, StreamableHttpServerParams, mcp_server_tools
 
 # deepwiki provides context about public GitHub repositories and requires no authentication
-EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/"
+EXAMPLE_MCP_ENDPOINT = "https://mcp.deepwiki.com/mcp"
 
 async def get_streamable_http_mcp_tools() -> List[StreamableHttpMcpToolAdapter]:
     """
