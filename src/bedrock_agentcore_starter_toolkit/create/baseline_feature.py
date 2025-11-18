@@ -21,6 +21,8 @@ class BaselineFeature(Feature):
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",
                     "requests >= 2.32.5",
+                    "pytest >= 7.0.0",
+                    "pytest-asyncio >= 0.21.0",
                 ]
             case TemplateDirSelection.MONOREPO_MCP_RUNTIME:
                 self.python_dependencies = [
