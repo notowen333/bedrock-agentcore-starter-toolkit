@@ -128,7 +128,8 @@
         "secretsmanager:GetSecretValue"
       ],
       "Resource": [
-        "arn:aws:secretsmanager:{{ region }}:{{ account_id }}:secret:bedrock-agentcore-identity!default/oauth2/*"
+        "arn:aws:secretsmanager:{{ region }}:{{ account_id }}:secret:bedrock-agentcore-identity!default/oauth2/*",
+        "arn:aws:secretsmanager:{{ region }}:{{ account_id }}:secret:bedrock-agentcore-identity!default/apikey/*"
       ]
     },
     {
@@ -176,6 +177,18 @@
         "arn:aws:bedrock-agentcore:{{ region }}:aws:code-interpreter/*",
         "arn:aws:bedrock-agentcore:{{ region }}:{{ account_id }}:code-interpreter/*",
         "arn:aws:bedrock-agentcore:{{ region }}:{{ account_id }}:code-interpreter-custom/*"
+      ]
+    },
+    {
+      "Sid": "BedrockAgentCoreIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:GetWorkloadAccessTokenForUserId"
+      ],
+      "Resource": [
+        "arn:aws:bedrock-agentcore:{{ region }}:{{ account_id }}:workload-identity-directory/default",
+        "arn:aws:bedrock-agentcore:{{ region }}:{{ account_id }}:workload-identity-directory/default/workload-identity/*"
       ]
     }
   ]
