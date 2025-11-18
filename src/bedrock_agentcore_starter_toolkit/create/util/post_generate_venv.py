@@ -21,8 +21,7 @@ def create_and_init_venv(ctx: ProjectContext) -> None:
         return
 
     _run(["uv", "venv", ".venv"], cwd=project_root)
-    _run(["uv", "pip", "install", "."], cwd=project_root)
-    _run(["uv", "lock"], cwd=project_root)
+    _run(["uv", "sync"], cwd=project_root)
 
 
 # ---------------------------------------------------------------------------
