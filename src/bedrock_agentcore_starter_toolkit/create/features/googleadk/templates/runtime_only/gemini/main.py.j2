@@ -4,7 +4,7 @@ from google.adk.sessions import InMemorySessionService
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from google.genai import types
 from mcp_client.client import get_streamable_http_mcp_client
-from .model import load_model
+from model.load import load_model
 
 # https://google.github.io/adk-docs/agents/models/
 MODEL_ID = "gemini-2.0-flash"

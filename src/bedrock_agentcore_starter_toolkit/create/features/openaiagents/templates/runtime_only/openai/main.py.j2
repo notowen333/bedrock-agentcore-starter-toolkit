@@ -3,7 +3,7 @@ import sys
 from agents import Agent, Runner, function_tool
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from mcp_client.client import get_streamable_http_mcp_client
-from .model import load_model
+from model.load import load_model
 
 # Set up logging
 logging.basicConfig(
