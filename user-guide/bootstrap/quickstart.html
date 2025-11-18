@@ -21,7 +21,7 @@
 
     
       
-        <title>Quickstart - Amazon Bedrock AgentCore</title>
+        <title>QuickStart: Generate Production Ready Projects with agentcore create - Amazon Bedrock AgentCore</title>
       
     
     
@@ -75,6 +75,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#quickstart-generate-production-ready-projects-with-agentcore-create" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -111,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Quickstart
+              QuickStart: Generate Production Ready Projects with agentcore create
             
           </span>
         </div>
@@ -901,6 +906,34 @@
     
   
     Identity Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity/quickstart-with-cli.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity CLI Quickstart
   
 
     
@@ -2069,6 +2102,82 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-agentcore-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is agentcore create?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-run-agentcore-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Run agentcore create
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-inspect-the-generated-monorepo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Inspect the generated monorepo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-local-dev" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Local dev
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Deploy
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -2088,9 +2197,79 @@
   
 
 
-  <h1>Quickstart</h1>
+<h1 id="quickstart-generate-production-ready-projects-with-agentcore-create">QuickStart: Generate Production Ready Projects with agentcore create<a class="headerlink" href="#quickstart-generate-production-ready-projects-with-agentcore-create" title="Permanent link">&para;</a></h1>
+<p>This tutorial shows you how to use the <code>agentcore create</code> command in the Amazon Bedrock AgentCore <a href="https://github.com/aws/bedrock-agentcore-starter-toolkit">starter toolkit</a>.</p>
+<h2 id="what-is-agentcore-create">What is agentcore create?<a class="headerlink" href="#what-is-agentcore-create" title="Permanent link">&para;</a></h2>
+<p><code>agentcore create</code> is a CLI-based project generator. First, provide the CLI a project name, Agent SDK, and IaC proivder either through the interactive prompt or by specifying <code>--project-name</code>, <code>--sdk</code>, and <code>--iac</code> flags.
+The command will write a project to the <code>cwd/project_name</code> directory that includes runtime code and infrastructure as code (CDK or Terraform) that models your Bedrock AgentCore project.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Python 3.10+</strong> installed</li>
+<li><strong>AWS Account</strong> with credentials configured. To configure your AWS credentials, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">Configuration and credential file settings in the AWS CLI</a>.</li>
+<li><strong>Permissions</strong> sufficient to deploy the modeled CDK or Terraform. The outputs of this tool are variable, so confirm the IAM permissions neccessary to deploy successfully.</li>
+</ul>
+<h2 id="step-1-run-agentcore-create">Step 1: Run agentcore create<a class="headerlink" href="#step-1-run-agentcore-create" title="Permanent link">&para;</a></h2>
+<p>Run <code>agentcore create</code> and follow the interactive prompts to name your project, select an Agent SDK, and select an IaC provider.</p>
+<p>Optional: <code>agentcore create</code> can consume and configure project settings from <code>.bedrock_agentcore.yaml</code>. To provide those settings, first run <code>agentcore configure --create</code> to
+specify agent name, authorization configuration, request header allowlist, and memory configuration. The <code>--create</code> flag streamlines the questionaire to only configure settings that <code>create</code> supports.</p>
+<p>If <code>agentcore configure</code> is run in the standard settings with already provided source code, you can still run <code>agentcore create</code>. However, the generated project will copy over your existing source code
+instead of generating source code. The IaC configuration will be simplified to create only an AgentCore runtime and a memory resource if it is specified in the <code>.bedrock_agentcore.yaml</code> spec.</p>
+<p>Note, not all settings are supported by <code>create</code> currently. Multiple agents, IAM profiles</p>
+<h2 id="step-2-inspect-the-generated-monorepo">Step 2: Inspect the generated monorepo<a class="headerlink" href="#step-2-inspect-the-generated-monorepo" title="Permanent link">&para;</a></h2>
+<p>Inspect the project output. Start with <code>project_name/README.md</code>. Inspect runtime code in the <code>src/</code> directory and modeled IaC code in the <code>cdk/</code> or <code>terraform/</code> directory (depending on your selection).</p>
+<h2 id="step-3-local-dev">Step 3: Local dev<a class="headerlink" href="#step-3-local-dev" title="Permanent link">&para;</a></h2>
+<p>Create and activate a venv in your new project:</p>
+<div class="highlight"><pre><span></span><code>cd project_name/src
 
+# If you have uv installed (recommended)
+uv sync  # automatically creates .venv if not present
 
+# pip approach
+# python -m venv .venv
+# source .venv/bin/activate
+# pip install .
+
+# Activate the environment (works for either)
+source .venv/bin/activate
+
+cd ..
+</code></pre></div>
+<p>Run and invoke the local server with hot-reloading of local changes:
+<div class="highlight"><pre><span></span><code>python run_local_server.py
+
+# In a new terminal session
+python invoke_local_server.py &quot;What can you do?&quot;
+</code></pre></div></p>
+<h2 id="step-4-deploy">Step 4: Deploy<a class="headerlink" href="#step-4-deploy" title="Permanent link">&para;</a></h2>
+<p>Follow the canonical steps for deploying in your chosen IaC.</p>
+<p>CDK steps:</p>
+<div class="highlight"><pre><span></span><code>First check that Node version is &gt;= 18:
+- `node -v` → example output: `v18.19.0`
+- [nvm](https://github.com/nvm-sh/nvm) is a helpful tool to manage Node versions
+
+Make sure you have AWS credentials with sufficient permissions in your environment.
+
+To deploy your project:
+
+- shorthand: `cd cdk &amp;&amp; npm install &amp;&amp; npm run cdk synth &amp;&amp; npm run cdk:deploy`
+- navigate to the `cdk` directory: `cd cdk`
+- install dependencies: `npm install`
+- synth the CDK project: `npm run cdk synth`
+- deploy all stacks: `npm run cdk:deploy`
+</code></pre></div>
+<p>Terraform steps:</p>
+<div class="highlight"><pre><span></span><code>First check that the `terraform` binary is installed with version &gt;= 1.2:
+- `terraform version -json | jq -r &#39;.terraform_version&#39;`
+- Terraform install [webpage](https://developer.hashicorp.com/terraform/install)
+
+Make sure you have AWS credentials with sufficient permissions in your environment.
+
+- shorthand: `cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply`
+- navigate to the `terraform` directory: `cd terraform`
+- download dependencies: `terraform init`
+- [optional] overview resources to be deployed: `terraform plan`
+- deploy to AWS: `terraform apply`
+</code></pre></div>
 
 
 

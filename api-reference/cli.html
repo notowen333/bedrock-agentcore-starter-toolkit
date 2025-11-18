@@ -925,6 +925,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/identity/quickstart-with-cli.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity CLI Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2183,6 +2211,106 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#identity-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-cognito" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Cognito
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-credential-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Credential Provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-workload-identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Workload Identity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-cognito-inbound-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get Cognito Inbound Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cleanup-identity-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup Identity Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-example-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Example Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Example Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-identity-setup-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Identity Setup Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gateway-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2467,6 +2595,106 @@
     <span class="md-ellipsis">
       
         Stop Session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-cognito" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup Cognito
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-credential-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Credential Provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-workload-identity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Workload Identity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-cognito-inbound-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get Cognito Inbound Token
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cleanup-identity-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup Identity Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identity-example-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identity Example Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identity Example Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-identity-setup-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Identity Setup Workflow
       
     </span>
   </a>
@@ -3009,6 +3237,240 @@ agentcore<span class="w"> </span>stop-session<span class="w"> </span>--agent<spa
 <p><code>--agent, -a TEXT</code>: Agent name</p>
 </li>
 </ul>
+<h2 id="identity-commands">Identity Commands<a class="headerlink" href="#identity-commands" title="Permanent link">&para;</a></h2>
+<p>Manage AgentCore Identity resources for OAuth authentication and external service access.</p>
+<h3 id="setup-cognito">Setup Cognito<a class="headerlink" href="#setup-cognito" title="Permanent link">&para;</a></h3>
+<p>Create Cognito user pools for Identity authentication.</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>setup-cognito<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p>Options:</p>
+<ul>
+<li><code>--region, -r TEXT</code>: AWS region (defaults to configured region)</li>
+<li><code>--auth-flow TEXT</code>: OAuth flow type - ‘user’ (USER_FEDERATION) or ‘m2m’ (M2M). Default: ‘user’</li>
+</ul>
+<p><strong>Auth Flow Types:</strong></p>
+<ul>
+<li><code>user</code> (default): USER_FEDERATION flow requiring user login and consent</li>
+<li>Creates user pool with hosted UI</li>
+<li>Generates test user credentials</li>
+<li>For agents that act on behalf of users</li>
+<li><code>m2m</code>: M2M flow for machine-to-machine</li>
+<li>Creates user pool with resource server and scopes</li>
+<li>No user accounts needed</li>
+<li>For agents that authenticate as themselves</li>
+</ul>
+<p><strong>What it creates:</strong></p>
+<p><strong>1. Cognito Agent User Pool</strong>: Manages user authentication to your agent</p>
+<ul>
+<li><strong>Purpose</strong>: Authenticates users TO your agent</li>
+<li><strong>Flow</strong>: User → Cognito → JWT → Agent Runtime</li>
+<li><strong>Contains</strong>: User directory for agent access</li>
+<li><strong>Environment prefix</strong>: <code>RUNTIME_*</code></li>
+</ul>
+<p><strong>2. Cognito Resource User Pool</strong>: Enables agent to access external resources</p>
+<ul>
+<li><strong>Purpose</strong>: Agent authenticates TO external services (GitHub, Google, etc.)</li>
+<li><strong>Flow</strong>: Agent → Identity → External Service</li>
+<li><strong>Contains</strong>: OAuth client credentials</li>
+<li><strong>Environment prefix</strong>: <code>IDENTITY_*</code></li>
+</ul>
+<p><strong>Output:</strong></p>
+<ul>
+<li>Displays Runtime and Identity pool configurations (passwords hidden)</li>
+<li>Saves to <code>.agentcore_identity_cognito_{flow}.json</code> (flow-specific JSON)</li>
+<li>Saves to <code>.agentcore_identity_{flow}.env</code> (flow-specific environment variables)</li>
+<li>Provides copy-paste commands using actual values</li>
+</ul>
+<p><strong>Security:</strong></p>
+<ul>
+<li>.env files have owner-only permissions (chmod 600)</li>
+<li>Passwords and secrets not echoed to terminal</li>
+<li>Flow-specific files prevent conflicts when using both flows</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create pools for user consent flow (default)</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>setup-cognito
+
+<span class="c1"># Create pools for machine-to-machine flow</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>setup-cognito<span class="w"> </span>--auth-flow<span class="w"> </span>m2m
+
+<span class="c1"># Load environment variables (bash/zsh)</span>
+<span class="nb">export</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">&#39;^#&#39;</span><span class="w"> </span>.agentcore_identity_user.env<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
+<span class="c1"># or for m2m:</span>
+<span class="nb">export</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">&#39;^#&#39;</span><span class="w"> </span>.agentcore_identity_m2m.env<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
+
+<span class="c1"># In Python</span>
+from<span class="w"> </span>dotenv<span class="w"> </span>import<span class="w"> </span>load_dotenv
+load_dotenv<span class="o">(</span><span class="s1">&#39;.agentcore_identity_user.env&#39;</span><span class="o">)</span>
+</code></pre></div>
+<h3 id="create-credential-provider">Create Credential Provider<a class="headerlink" href="#create-credential-provider" title="Permanent link">&para;</a></h3>
+<p>Create an OAuth 2.0 credential provider for external service authentication.</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>create-credential-provider<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p>Options:</p>
+<ul>
+<li><code>--name TEXT</code>: Provider name (required)</li>
+<li><code>--type TEXT</code>: Provider type: cognito, github, google, salesforce (required)</li>
+<li><code>--client-id TEXT</code>: OAuth 2.0 client ID (required)</li>
+<li><code>--client-secret TEXT</code>: OAuth 2.0 client secret (required)</li>
+<li><code>--discovery-url TEXT</code>: OIDC discovery URL (required for cognito)</li>
+<li><code>--cognito-pool-id TEXT</code>: Cognito User Pool ID (optional, for auto-updating callback URLs)</li>
+<li><code>--region TEXT</code>: AWS region (defaults to configured region)</li>
+</ul>
+<p><strong>Provider Types:</strong></p>
+<ul>
+<li><code>cognito</code>: Amazon Cognito User Pools</li>
+<li><code>github</code>: GitHub OAuth</li>
+<li><code>google</code>: Google OAuth</li>
+<li><code>salesforce</code>: Salesforce OAuth</li>
+</ul>
+<p><strong>Discovery URL Format:</strong>
+Must be the complete OIDC discovery URL including <code>.well-known/openid-configuration</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Cognito format</span>
+https://cognito-idp.us-west-2.amazonaws.com/us-west-2_xxxxx/.well-known/openid-configuration
+</code></pre></div>
+<p><strong>Automatic Configuration:</strong></p>
+<ul>
+<li>Creates the credential provider in AgentCore Identity</li>
+<li>Adds provider configuration to <code>.bedrock_agentcore.yaml</code></li>
+<li>IAM permissions added automatically during <code>agentcore launch</code></li>
+</ul>
+<p><strong>Note:</strong> After creating a provider, you must register the returned <code>callbackUrl</code> in your OAuth provider’s settings (except for Cognito, which is auto-configured with <code>--cognito-pool-id</code>).</p>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Using environment variables from setup-cognito</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>create-credential-provider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>MyServiceProvider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>cognito<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-id<span class="w"> </span><span class="nv">$IDENTITY_CLIENT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-secret<span class="w"> </span><span class="nv">$IDENTITY_CLIENT_SECRET</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--discovery-url<span class="w"> </span><span class="nv">$IDENTITY_DISCOVERY_URL</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cognito-pool-id<span class="w"> </span><span class="nv">$IDENTITY_POOL_ID</span>
+
+<span class="c1"># GitHub provider</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>create-credential-provider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>MyGitHub<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>github<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-id<span class="w"> </span><span class="s2">&quot;github_client_id&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-secret<span class="w"> </span><span class="s2">&quot;github_client_secret&quot;</span>
+
+<span class="c1"># IMPORTANT: Register the callback URL from the response</span>
+<span class="c1"># in your GitHub OAuth app settings</span>
+</code></pre></div>
+<h3 id="create-workload-identity">Create Workload Identity<a class="headerlink" href="#create-workload-identity" title="Permanent link">&para;</a></h3>
+<p>Create a workload identity for agent-to-Identity service authentication.</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>create-workload-identity<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p>Options:</p>
+<ul>
+<li><code>--name TEXT</code>: Workload identity name (auto-generated if not provided)</li>
+<li><code>--region TEXT</code>: AWS region (defaults to configured region)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>create-workload-identity<span class="w"> </span>--name<span class="w"> </span>my-workload
+</code></pre></div>
+<h3 id="get-cognito-inbound-token">Get Cognito Inbound Token<a class="headerlink" href="#get-cognito-inbound-token" title="Permanent link">&para;</a></h3>
+<p>Generate a JWT bearer token from Cognito for Runtime inbound authentication.</p>
+<p>Automatically loads credentials from environment variables. Explicit parameters override environment variables.</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>get-cognito-inbound-token<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p>Options:</p>
+<ul>
+<li><code>--auth-flow TEXT</code>: OAuth flow type - ‘user’ (USER_FEDERATION, default) or ‘m2m’ (M2M)</li>
+<li><code>--pool-id TEXT</code>: Cognito User Pool ID (auto-loads from RUNTIME_POOL_ID)</li>
+<li><code>--client-id TEXT</code>: Cognito App Client ID (auto-loads from RUNTIME_CLIENT_ID)</li>
+<li><code>--client-secret TEXT</code>: Client secret (auto-loads from RUNTIME_CLIENT_SECRET, required for m2m)</li>
+<li><code>--username TEXT</code>: Username (auto-loads from RUNTIME_USERNAME, required for user flow)</li>
+<li><code>--password TEXT</code>: Password (auto-loads from RUNTIME_PASSWORD, required for user flow)</li>
+<li><code>--region TEXT</code>: AWS region</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Auto-load from environment (user flow - simplest)</span>
+<span class="nb">export</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">&#39;^#&#39;</span><span class="w"> </span>.agentcore_identity_user.env<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
+<span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>agentcore<span class="w"> </span>identity<span class="w"> </span>get-cognito-inbound-token<span class="k">)</span>
+
+<span class="c1"># Auto-load from environment (m2m flow)</span>
+<span class="nb">export</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">&#39;^#&#39;</span><span class="w"> </span>.agentcore_identity_m2m.env<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
+<span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>agentcore<span class="w"> </span>identity<span class="w"> </span>get-cognito-inbound-token<span class="w"> </span>--auth-flow<span class="w"> </span>m2m<span class="k">)</span>
+
+<span class="c1"># Explicit parameters (overrides env)</span>
+<span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>agentcore<span class="w"> </span>identity<span class="w"> </span>get-cognito-inbound-token<span class="w"> </span><span class="se">\</span>
+<span class="w">         </span>--pool-id<span class="w"> </span>us-west-2_xxx<span class="w"> </span>--client-id<span class="w"> </span>abc123<span class="w"> </span><span class="se">\</span>
+<span class="w">         </span>--username<span class="w"> </span>user<span class="w"> </span>--password<span class="w"> </span>pass<span class="k">)</span>
+
+<span class="c1"># Use token with agent</span>
+agentcore<span class="w"> </span>invoke<span class="w"> </span><span class="s1">&#39;{&quot;prompt&quot;: &quot;test&quot;}&#39;</span><span class="w"> </span>--bearer-token<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h3 id="cleanup-identity-resources">Cleanup Identity Resources<a class="headerlink" href="#cleanup-identity-resources" title="Permanent link">&para;</a></h3>
+<p>Remove all Identity resources for an agent.</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>identity<span class="w"> </span>cleanup<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<p>Options:</p>
+<ul>
+<li><code>--agent, -a TEXT</code>: Agent name</li>
+<li><code>--force, -f</code>: Skip confirmation prompts</li>
+</ul>
+<p><strong>Deleted Resources:</strong></p>
+<ul>
+<li>Credential providers</li>
+<li>Workload identities</li>
+<li>Cognito user pools (if created by setup-cognito)</li>
+<li>IAM inline policies (AgentCoreIdentityAccess)</li>
+<li>Configuration files (.agentcore_identity_*)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clean up with confirmation</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>cleanup<span class="w"> </span>--agent<span class="w"> </span>my-agent
+
+<span class="c1"># Clean up without prompts</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>cleanup<span class="w"> </span>--agent<span class="w"> </span>my-agent<span class="w"> </span>--force
+</code></pre></div>
+<h2 id="identity-example-usage">Identity Example Usage<a class="headerlink" href="#identity-example-usage" title="Permanent link">&para;</a></h2>
+<h3 id="complete-identity-setup-workflow">Complete Identity Setup Workflow<a class="headerlink" href="#complete-identity-setup-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. Create Cognito pools</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>setup-cognito
+
+<span class="c1"># 2. Load environment variables</span>
+<span class="nb">export</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">&#39;^#&#39;</span><span class="w"> </span>.agentcore_identity_user.env<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="k">)</span>
+
+<span class="c1"># 3. Configure agent with JWT auth</span>
+agentcore<span class="w"> </span>configure<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span>agent.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-agent<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--authorizer-config<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;customJWTAuthorizer&quot;: {</span>
+<span class="s1">      &quot;discoveryUrl&quot;: &quot;&#39;</span><span class="nv">$RUNTIME_DISCOVERY_URL</span><span class="s1">&#39;&quot;,</span>
+<span class="s1">      &quot;allowedClients&quot;: [&quot;&#39;</span><span class="nv">$RUNTIME_CLIENT_ID</span><span class="s1">&#39;&quot;]</span>
+<span class="s1">    }</span>
+<span class="s1">  }&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--disable-memory
+
+<span class="c1"># 4. Create credential provider</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>create-credential-provider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>MyServiceProvider<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--type<span class="w"> </span>cognito<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-id<span class="w"> </span><span class="nv">$IDENTITY_CLIENT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--client-secret<span class="w"> </span><span class="nv">$IDENTITY_CLIENT_SECRET</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--discovery-url<span class="w"> </span><span class="nv">$IDENTITY_DISCOVERY_URL</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cognito-pool-id<span class="w"> </span><span class="nv">$IDENTITY_POOL_ID</span>
+
+<span class="c1"># 5. Create workload identity</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>create-workload-identity<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>my-agent-workload
+
+<span class="c1"># 6. Deploy agent</span>
+agentcore<span class="w"> </span>launch
+
+<span class="c1"># 7. Get bearer token for Runtime auth</span>
+<span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>agentcore<span class="w"> </span>identity<span class="w"> </span>get-cognito-inbound-token<span class="k">)</span>
+
+<span class="c1"># 8. Invoke with JWT authentication</span>
+agentcore<span class="w"> </span>invoke<span class="w"> </span><span class="s1">&#39;{&quot;prompt&quot;: &quot;Call external service&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--bearer-token<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--session-id<span class="w"> </span><span class="s2">&quot;demo_session_</span><span class="k">$(</span>uuidgen<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># 9. Cleanup when done</span>
+agentcore<span class="w"> </span>identity<span class="w"> </span>cleanup<span class="w"> </span>--agent<span class="w"> </span>my-agent<span class="w"> </span>--force
+</code></pre></div>
 <h2 id="gateway-commands">Gateway Commands<a class="headerlink" href="#gateway-commands" title="Permanent link">&para;</a></h2>
 <p>Access gateway subcommands:</p>
 <div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>gateway<span class="w"> </span><span class="o">[</span>COMMAND<span class="o">]</span>
