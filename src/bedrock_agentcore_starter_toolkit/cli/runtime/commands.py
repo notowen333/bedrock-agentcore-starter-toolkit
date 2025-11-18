@@ -694,7 +694,7 @@ def invoke(
     ),
     local_mode: Optional[bool] = typer.Option(False, "--local", "-l", help="Send request to a running local container"),
     dev_mode: Optional[bool] = typer.Option(False, "--dev", "-d", help="Send request to local development server"),
-    dev_port: Optional[int] = typer.Option(8080, "--dev-port", help="Port for local development server"),
+    port: Optional[int] = typer.Option(8080, "--port", help="Port for local development server"),
     user_id: Optional[str] = typer.Option(None, "--user-id", "-u", help="User id for authorization flows"),
     headers: Optional[str] = typer.Option(
         None,
@@ -708,7 +708,7 @@ def invoke(
 
     # Handle dev mode - simple HTTP request to development server
     if dev_mode:
-        _invoke_dev_server(payload, dev_port)
+        _invoke_dev_server(payload, port)
         return
 
     try:
@@ -1348,7 +1348,7 @@ def _invoke_dev_server(payload: str, port: int = 8080) -> None:
                 "   [cyan]agentcore create myproject[/cyan]\n"
                 "   [cyan]cd myproject[/cyan]\n"
                 "   [cyan]agentcore dev[/cyan]\n"
-                f'   [cyan]agentcore invoke --dev --dev-port {port} "Hello"[/cyan]',
+                f'   [cyan]agentcore invoke --dev --port {port} "Hello"[/cyan]',
                 title="⚠️ Setup Required",
                 border_style="bright_blue",
             )
