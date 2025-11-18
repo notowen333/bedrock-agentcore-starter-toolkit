@@ -694,6 +694,7 @@ def invoke(
     ),
     local_mode: Optional[bool] = typer.Option(False, "--local", "-l", help="Send request to a running local container"),
     dev_mode: Optional[bool] = typer.Option(False, "--dev", "-d", help="Send request to local development server"),
+    dev_port: Optional[int] = typer.Option(8080, "--dev-port", help="Port for local development server"),
     user_id: Optional[str] = typer.Option(None, "--user-id", "-u", help="User id for authorization flows"),
     headers: Optional[str] = typer.Option(
         None,
@@ -707,7 +708,7 @@ def invoke(
 
     # Handle dev mode - simple HTTP request to development server
     if dev_mode:
-        _invoke_dev_server(payload)
+        _invoke_dev_server(payload, dev_port)
         return
 
     try:
@@ -1318,7 +1319,7 @@ def destroy(
         _handle_error(f"Destruction failed: {e}", e)
 
 
-def _invoke_dev_server(payload: str) -> None:
+def _invoke_dev_server(payload: str, port: int = 8080) -> None:
     """Invoke local development server with simple HTTP request."""
     # Try to parse payload as JSON, fallback to wrapping in prompt
     try:
@@ -1326,7 +1327,7 @@ def _invoke_dev_server(payload: str) -> None:
     except json.JSONDecodeError:
         payload_data = {"prompt": payload}
 
-    url = "http://localhost:8080/invocations"
+    url = f"http://localhost:{port}/invocations"
 
     try:
         response = requests.post(url, json=payload_data, headers={"Content-Type": "application/json"}, timeout=30)
@@ -1342,12 +1343,12 @@ def _invoke_dev_server(payload: str) -> None:
         console.print(
             Panel(
                 "⚠️ [yellow]Development Server Not Found[/yellow]\n\n"
-                "No development server found on http://localhost:8080\n\n"
+                f"No development server found on http://localhost:{port}\n\n"
                 "[bold]Get Started:[/bold]\n"
                 "   [cyan]agentcore create myproject[/cyan]\n"
                 "   [cyan]cd myproject[/cyan]\n"
                 "   [cyan]agentcore dev[/cyan]\n"
-                '   [cyan]agentcore invoke --dev \'{"prompt": "Hello"}\'[/cyan]',
+                f'   [cyan]agentcore invoke --dev --dev-port {port} "Hello"[/cyan]',
                 title="⚠️ Setup Required",
                 border_style="bright_blue",
             )
