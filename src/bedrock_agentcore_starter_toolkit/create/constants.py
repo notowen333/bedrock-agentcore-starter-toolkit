@@ -79,7 +79,7 @@ class ModelProvider:
             SDKProvider.CREWAI: {"Bedrock"},
             SDKProvider.AUTOGEN: {"Bedrock"},
             SDKProvider.STRANDS: {"Bedrock", "OpenAI", "Anthropic", "Gemini"},
-            SDKProvider.LANG_GRAPH: {"Bedrock"},
+            SDKProvider.LANG_GRAPH: {"Bedrock","OpenAI", "Anthropic", "Gemini"},
         }
     }
 

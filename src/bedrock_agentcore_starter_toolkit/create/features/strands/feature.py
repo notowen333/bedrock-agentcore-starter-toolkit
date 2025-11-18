@@ -30,7 +30,7 @@ class StrandsFeature(Feature):
                 case ModelProvider.Anthropic:
                     self.python_dependencies = base_python_dependencies + ["strands-agents[anthropic] >= 1.13.0"]
                 case ModelProvider.Gemini:
-                    self.python_dependencies = base_python_dependencies + ["strands-agents[gemini] >= 1.13.0"]
+                    self.python_dependencies = base_python_dependencies + ["strands-agents[gemini]Chec >= 1.13.0"]
 
     def after_apply(self, context: ProjectContext) -> None:
         """Hook called after template rendering and code generation."""
