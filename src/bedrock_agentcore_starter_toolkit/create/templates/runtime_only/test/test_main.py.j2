@@ -6,10 +6,10 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-{% if sdk_provider == "CrewAI" %}
+{%- if sdk_provider == "CrewAI" %}
 # Mock CrewAI LLM to prevent initialization errors
 with patch('crewai.LLM', MagicMock()):
-    {% if model_provider == "Bedrock" %}
+    {%- if model_provider == "Bedrock" %}
     # Mock MCP client for CrewAI + Bedrock
     mock_mcp_client = Mock()
     mock_mcp_client.list_tools_sync.return_value = []
@@ -17,13 +17,13 @@ with patch('crewai.LLM', MagicMock()):
     mock_mcp_client.__exit__ = Mock(return_value=False)
     with patch('mcp_client.client.get_streamable_http_mcp_client', return_value=mock_mcp_client):
         from main import app, invoke
-    {% else %}
+    {%- else %}
     from main import app, invoke
-    {% endif %}
+    {%- endif %}
 
-{% elif model_provider == "Bedrock" and sdk_provider in ["Strands", "LangGraph", "AutoGen"] %}
+{%- elif model_provider == "Bedrock" and sdk_provider in ["Strands", "LangGraph", "AutoGen"] %}
 # Mock MCP client to prevent Gateway connection attempts
-{% if sdk_provider == "AutoGen" %}
+{%- if sdk_provider == "AutoGen" %}
 # Mock anthropic module to prevent import errors
 mock_anthropic = MagicMock()
 mock_anthropic.types = MagicMock()
@@ -31,31 +31,31 @@ sys.modules['anthropic'] = mock_anthropic
 sys.modules['anthropic.types'] = mock_anthropic.types
 with patch('mcp_client.client.get_streamable_http_mcp_tools', AsyncMock(return_value=[])):
     from main import app, main
-{% else %}
+{%- else %}
 mock_mcp_client = Mock()
-{% if sdk_provider == "LangGraph" %}
+{%- if sdk_provider == "LangGraph" %}
 mock_mcp_client.get_tools = AsyncMock(return_value=[])
-{% else %}
+{%- else %}
 mock_mcp_client.list_tools_sync.return_value = []
-{% endif %}
+{%- endif %}
 mock_mcp_client.__enter__ = Mock(return_value=mock_mcp_client)
 mock_mcp_client.__exit__ = Mock(return_value=False)
 with patch('mcp_client.client.get_streamable_http_mcp_client', return_value=mock_mcp_client):
     from main import app, invoke
-{% endif %}
-{% else %}
+{%- endif %}
+{%- else %}
 # Standard import - no MCP client mocking needed
-{% if sdk_provider in ["GoogleADK", "OpenAIAgents"] and model_provider != "Bedrock" %}
+{%- if sdk_provider in ["GoogleADK", "OpenAIAgents"] and model_provider != "Bedrock" %}
 # Mock load_model to prevent API key provider calls during import
 with patch('model.load.load_model'):
     from main import app, agent_invocation
-{% else %}
-from main import app{% if sdk_provider == "LangGraph" %}, invoke{% elif sdk_provider == "OpenAIAgents" %}, agent_invocation{% elif sdk_provider == "AutoGen" %}, main{% elif sdk_provider == "GoogleADK" %}, agent_invocation{% else %}, invoke{% endif %}
-{% endif %}
-{% endif %}
+{%- else %}
+from main import app{%- if sdk_provider == "LangGraph" %}, invoke{%- elif sdk_provider == "OpenAIAgents" %}, agent_invocation{%- elif sdk_provider == "AutoGen" %}, main{%- elif sdk_provider == "GoogleADK" %}, agent_invocation{%- else %}, invoke{%- endif %}
+{%- endif %}
+{%- endif %}
 
 class TestAgent:
-    {% if sdk_provider == "LangGraph" %}
+    {%- if sdk_provider == "LangGraph" %}
     @patch('main.load_model')
     @patch('main.create_agent')
     @pytest.mark.asyncio
@@ -70,7 +70,8 @@ class TestAgent:
         result = await invoke(payload)
 
         assert result == {"result": "Test response"}
-    {% elif sdk_provider == "CrewAI" %}
+    {%- elif sdk_provider == "CrewAI" %}
+
     @patch('main.Agent')
     @patch('main.Task')
     @patch('main.Crew')
@@ -86,7 +87,8 @@ class TestAgent:
         result = invoke(payload)
 
         assert result == "Test response"
-    {% elif sdk_provider == "OpenAIAgents" %}
+    {%- elif sdk_provider == "OpenAIAgents" %}
+
     @patch('main.main')
     @pytest.mark.asyncio
     async def test_agent_invocation_with_prompt(self, mock_main):
@@ -100,7 +102,8 @@ class TestAgent:
         result = await agent_invocation(payload, context)
 
         assert result == {"result": "Test response"}
-    {% elif sdk_provider == "AutoGen" %}
+    {%- elif sdk_provider == "AutoGen" %}
+
     @patch('main.AssistantAgent')
     @pytest.mark.asyncio
     async def test_main_with_prompt(self, mock_agent_class):
@@ -115,7 +118,8 @@ class TestAgent:
         result = await main(payload)
 
         assert result == {"result": "Test response"}
-    {% elif sdk_provider == "GoogleADK" %}
+    {%- elif sdk_provider == "GoogleADK" %}
+
     @patch('main.call_agent_async')
     @pytest.mark.asyncio
     async def test_agent_invocation_with_prompt(self, mock_call_agent):
@@ -128,7 +132,8 @@ class TestAgent:
 
         mock_call_agent.assert_called_once()
         assert result == {"result": "Test response"}
-    {% else %}
+    {%- else %}
+
     @patch('main.load_model')
     @patch('main.Agent')
     def test_invoke_with_prompt(self, mock_agent_class, mock_load_model):
@@ -142,7 +147,7 @@ class TestAgent:
 
         mock_agent.assert_called_once_with("Hello, how are you?")
         assert result == {"response": "Test response"}
-    {% endif %}
+    {%- endif %}
 
 class TestBedrockAgentCoreApp:
     def test_app_initialization(self):
@@ -152,13 +157,16 @@ class TestBedrockAgentCoreApp:
 
     def test_entrypoint_decorator(self):
         """Test that entrypoint function is properly decorated"""
-        {% if sdk_provider == "OpenAIAgents" or sdk_provider == "GoogleADK" %}
+        {%- if sdk_provider == "OpenAIAgents" or sdk_provider == "GoogleADK" %}
+
         assert hasattr(agent_invocation, '__name__')
         assert agent_invocation.__name__ == 'agent_invocation'
-        {% elif sdk_provider == "AutoGen" %}
+        {%- elif sdk_provider == "AutoGen" %}
+
         assert hasattr(main, '__name__')
         assert main.__name__ == 'main'
-        {% else %}
+        {%- else %}
+
         assert hasattr(invoke, '__name__')
         assert invoke.__name__ == 'invoke'
-        {% endif %}
+        {%- endif %}
