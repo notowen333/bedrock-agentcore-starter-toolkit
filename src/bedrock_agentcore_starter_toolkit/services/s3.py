@@ -67,7 +67,7 @@ def create_s3_bucket(bucket_name: str, region: str, account_id: str) -> str:
 
     try:
         if region == "us-east-1":
-            s3.create_bucket(Bucket=bucket_name, ExpectedBucketOwner=account_id)
+            s3.create_bucket(Bucket=bucket_name)
         else:
             s3.create_bucket(
                 Bucket=bucket_name,
@@ -77,7 +77,6 @@ def create_s3_bucket(bucket_name: str, region: str, account_id: str) -> str:
 
         s3.put_bucket_lifecycle_configuration(
             Bucket=bucket_name,
-            ExpectedBucketOwner=account_id,
             LifecycleConfiguration={
                 "Rules": [{"ID": "DeleteOldBuilds", "Status": "Enabled", "Filter": {}, "Expiration": {"Days": 7}}]
             },
