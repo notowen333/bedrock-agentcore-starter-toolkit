@@ -1,0 +1,74 @@
+import os
+from crewai import Agent, Crew, LLM, Task, Process
+from crewai.tools import tool
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from mcp_client.client import get_streamable_http_mcp_client
+from bedrock_agentcore.identity.auth import requires_api_key
+from dotenv import load_dotenv
+
+@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
+def agentcore_identity_api_key_provider(api_key: str) -> str:
+    return api_key
+
+def get_authenticated_model() -> LLM:
+    if os.getenv("LOCAL_DEV") == "1":
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY")
+    else:
+        api_key = agentcore_identity_api_key_provider()
+
+    return LLM(
+        model="gemini/gemini-2.5-flash",
+        api_key=api_key,  # Or set GOOGLE_API_KEY/GEMINI_API_KEY
+    )
+
+# Define a simple function tool
+@tool
+def add_numbers(a: int, b: int) -> int:
+    """Return the sum of two numbers"""
+    return a+b
+
+
+# Import AgentCore Gateway as Streamable HTTP MCP Adapter
+mcp_adapter = get_streamable_http_mcp_client()
+
+# Integrate with Bedrock AgentCore
+app = BedrockAgentCoreApp()
+
+@app.entrypoint
+def invoke(payload):
+    # assume payload input is structured as { "prompt": "<user input>" }
+
+    # Define the Agent, Task and Crew with Tools
+    with mcp_adapter as tools:
+        agent = Agent(
+            role="Question Answering Assistant",
+            goal="Answer the users questions",
+            backstory="Always eager to answer any questions",
+            llm=get_authenticated_model(),
+            tools=tools + [add_numbers]
+        )
+
+        task = Task(
+            agent=agent,
+            description="Answer the users question: {prompt}",
+            expected_output="An answer to the users question"
+        )
+
+        crew = Crew(
+            agents=[agent],
+            tasks=[task],
+            process=Process.sequential
+        )
+
+        # Process the user prompt
+        prompt = payload.get("prompt", "What is Agentic AI?")
+
+        # Run the agent
+        result = crew.kickoff(inputs={"prompt": prompt})
+
+        # Return result
+        return result.raw
+
+if __name__ == "__main__":
+    app.run()

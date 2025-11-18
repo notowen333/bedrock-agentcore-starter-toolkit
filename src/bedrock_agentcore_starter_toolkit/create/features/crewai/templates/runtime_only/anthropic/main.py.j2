@@ -1,14 +1,27 @@
+import os
 from crewai import Agent, Crew, LLM, Task, Process
 from crewai.tools import tool
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from mcp_client.client import get_streamable_http_mcp_client
+from bedrock_agentcore.identity.auth import requires_api_key
+from dotenv import load_dotenv
 
-# Uses global inference profile for Claude Sonnet 4.5
-# https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html
-MODEL_ID="bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
+def agentcore_identity_api_key_provider(api_key: str) -> str:
+    return api_key
 
-# Initialize the model client
-llm = LLM(model=MODEL_ID)
+def get_authenticated_model() -> LLM:
+    if os.getenv("LOCAL_DEV") == "1":
+        load_dotenv()
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+    else:
+        api_key = agentcore_identity_api_key_provider()
+
+    return LLM(
+        model="anthropic/claude-sonnet-4-5-20250929",
+        api_key=api_key,
+        max_tokens=4096  # Required for Anthropic
+    )
 
 # Define a simple function tool
 @tool
@@ -33,7 +46,7 @@ def invoke(payload):
             role="Question Answering Assistant",
             goal="Answer the users questions",
             backstory="Always eager to answer any questions",
-            llm=llm,
+            llm=get_authenticated_model(),
             tools=tools + [add_numbers]
         )
 

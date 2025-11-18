@@ -76,7 +76,7 @@ class ModelProvider:
         "runtime_only": {
             SDKProvider.OPENAI_AGENTS: {"OpenAI"},
             SDKProvider.GOOGLE_ADK: {"Gemini"},
-            SDKProvider.CREWAI: {"Bedrock"},
+            SDKProvider.CREWAI: {"Bedrock","OpenAI", "Anthropic", "Gemini"},
             SDKProvider.AUTOGEN: {"Bedrock"},
             SDKProvider.STRANDS: {"Bedrock", "OpenAI", "Anthropic", "Gemini"},
             SDKProvider.LANG_GRAPH: {"Bedrock","OpenAI", "Anthropic", "Gemini"},
