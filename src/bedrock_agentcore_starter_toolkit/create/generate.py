@@ -156,7 +156,7 @@ def _apply_iac_generation(ctx: ProjectContext, agent_config) -> None:
         # create dockerfile
         ContainerRuntime().generate_dockerfile(
             agent_path=ctx.entrypoint_path,
-            output_dir=ctx.src_dir,
+            output_dir=ctx.output_dir,
             explicit_requirements_file=ctx.output_dir / "pyproject.toml",
             agent_name=ctx.agent_name,
             enable_observability=ctx.observability_enabled,
