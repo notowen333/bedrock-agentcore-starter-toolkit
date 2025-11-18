@@ -29,6 +29,7 @@ class BaselineFeature(Feature):
             case TemplateDirSelection.RUNTIME_ONLY:
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",
+                    "python-dotenv >= 1.2.1"
                 ]
         super().__init__()
 

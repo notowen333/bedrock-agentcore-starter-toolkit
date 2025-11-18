@@ -13,7 +13,10 @@ class OpenAIAgentsFeature(Feature):
 
     def before_apply(self, context: ProjectContext) -> None:
         """Hook called before template rendering and code generation."""
-        pass
+        from ...constants import TemplateDirSelection
+
+        if context.template_dir_selection == TemplateDirSelection.RUNTIME_ONLY:
+            self.model_provider_name = context.model_provider.lower()
 
     def after_apply(self, context: ProjectContext) -> None:
         """Hook called after template rendering and code generation."""

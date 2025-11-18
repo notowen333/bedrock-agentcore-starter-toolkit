@@ -1,34 +1,16 @@
-import os
 from google.adk.agents import Agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from google.genai import types
 from mcp_client.client import get_streamable_http_mcp_client
-from bedrock_agentcore.identity.auth import requires_api_key
-from dotenv import load_dotenv
+from .model import load_model
 
 # https://google.github.io/adk-docs/agents/models/
 MODEL_ID = "gemini-2.0-flash"
 
 APP_NAME="{{ agent_name }}"
 USER_ID="user1234"
-
-@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
-def agentcore_identity_api_key_provider(api_key: str) -> str:
-    return api_key
-
-def authenticate_model() -> str:
-    if os.getenv("LOCAL_DEV") == "1":
-        load_dotenv()
-        api_key = os.getenv("GEMINI_API_KEY")
-    else:
-        api_key = agentcore_identity_api_key_provider()
-
-    # Use Google AI Studios API Key Authentication.
-    # https://google.github.io/adk-docs/agents/models/#google-ai-studio
-    os.environ["GOOGLE_API_KEY"] = api_key
-    os.environ["GOOGLE_GENAI_USE_VERTEXAI"]="FALSE"
 
 # Define a simple function tool
 def add_numbers(a: int, b: int) -> int:
@@ -37,8 +19,8 @@ def add_numbers(a: int, b: int) -> int:
 
 mcp_toolset = get_streamable_http_mcp_client()
 
-# Authenticate Model
-authenticate_model()
+# Set environment variables for model authentication
+load_model()
 
 # Agent Definition
 # Add your GEMINI_API_KEY or GOOGLE_API_KEY to AgentCore Runtime Environment Variables
