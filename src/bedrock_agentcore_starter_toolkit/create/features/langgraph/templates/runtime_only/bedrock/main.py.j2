@@ -1,15 +1,9 @@
-import os
 from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
-from langchain_aws import ChatBedrock
 from langchain.tools import tool
 from bedrock_agentcore import BedrockAgentCoreApp
 from mcp_client.client import get_streamable_http_mcp_client
-
-# Uses global inference profile for Claude Sonnet 4.5
-# https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html
-# Initialize the model client
-llm = ChatBedrock(model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0")
+from .model import load_model
 
 # Define a simple function tool
 @tool
@@ -31,7 +25,7 @@ async def invoke(payload):
     tools = await mcp_client.get_tools()
 
     # Define the agent
-    graph = create_agent(llm, tools=tools + [add_numbers])
+    graph = create_agent(load_model(), tools=tools + [add_numbers])
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")

@@ -1,12 +1,7 @@
-import os
 from strands import Agent, tool
-from strands.models import BedrockModel
 from bedrock_agentcore import BedrockAgentCoreApp
 from mcp_client.client import get_streamable_http_mcp_client
-
-# Uses global inference profile for Claude Sonnet 4.5
-# https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-support.html
-model = BedrockModel(model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0")
+from .model import load_model
 
 # Define a simple function tool
 @tool
@@ -29,7 +24,7 @@ def invoke(payload):
     with mcp_client as client:
         tools = client.list_tools_sync()
 
-        agent = Agent(model=model, tools=tools + [add_numbers])
+        agent = Agent(model=load_model(), tools=tools + [add_numbers])
 
         # Process the user prompt
         prompt = payload.get("prompt", "What is Agentic AI?")

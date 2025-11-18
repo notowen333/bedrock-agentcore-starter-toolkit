@@ -30,8 +30,6 @@ class BaselineFeature(Feature):
                 self.python_dependencies = [
                     "bedrock-agentcore >= 1.0.3",
                 ]
-        if ctx.model_provider != ModelProvider.Bedrock:
-            self.python_dependencies.append("python-dotenv >= 1.2.1")
         super().__init__()
 
     def before_apply(self, context):

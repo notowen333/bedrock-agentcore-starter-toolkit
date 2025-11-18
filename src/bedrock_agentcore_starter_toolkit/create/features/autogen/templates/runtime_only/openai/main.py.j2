@@ -1,30 +1,8 @@
-import os
 from autogen_agentchat.agents import AssistantAgent
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from autogen_core.tools import FunctionTool
-from autogen_core.models import ModelInfo, ModelFamily
 from mcp_client.client import get_streamable_http_mcp_tools
-from bedrock_agentcore.identity.auth import requires_api_key
-from dotenv import load_dotenv
-
-@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
-def agentcore_identity_api_key_provider(api_key: str) -> str:
-    return api_key
-
-def get_authenticated_model() -> OpenAIChatCompletionClient:
-    """
-    Get authenticated OpenAI model client.
-    Uses AgentCore Identity for API key management in deployed environments,
-    and falls back to .env file for local development.
-    """
-    if os.getenv("LOCAL_DEV") == "1":
-        load_dotenv()
-        api_key = os.getenv("OPENAI_API_KEY")
-    else:
-        api_key = agentcore_identity_api_key_provider()
-
-    return OpenAIChatCompletionClient(model="gpt-5", api_key=api_key)
+from .model import load_model
 
 # Define a simple function tool
 def add_numbers(a: int, b: int) -> int:
@@ -45,7 +23,7 @@ async def main(payload):
     # Define an AssistantAgent with the model and tool
     agent = AssistantAgent(
         name="{{ agent_name }}",
-        model_client=get_authenticated_model(),
+        model_client=load_model(),
         tools=[add_numbers_function_tool] + tools,
         system_message="You are a helpful assistant."
     )
