@@ -1,8 +1,24 @@
 import logging
 import sys
+import os
 from agents import Agent, Runner, function_tool
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from mcp_client.client import get_streamable_http_mcp_client
+from bedrock_agentcore.identity.auth import requires_api_key
+from dotenv import load_dotenv
+
+@requires_api_key(provider_name=os.getenv("BEDROCK_AGENTCORE_MODEL_PROVIDER_API_KEY_NAME", ""))
+def agentcore_identity_api_key_provider(api_key: str) -> str:
+    return api_key
+
+def authenticate_model() -> None:
+    if os.getenv("LOCAL_DEV") == "1":
+        load_dotenv()
+        api_key = os.getenv("OPENAI_API_KEY")
+    else:
+        api_key = agentcore_identity_api_key_provider()
+
+    os.environ["OPENAI_API_KEY"] = api_key
 
 # Set up logging
 logging.basicConfig(
@@ -46,6 +62,7 @@ app = BedrockAgentCoreApp()
 @app.entrypoint
 async def agent_invocation(payload, context):
     # assume payload input is structured as { "prompt": "<user input>" }
+    authenticate_model()
 
     # Process the user prompt
     prompt = payload.get("prompt", "What is Agentic AI?")
