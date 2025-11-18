@@ -84,8 +84,9 @@ def generate_project(
     if not ctx.iac_provider:
         ctx.memory_enabled = False
         write_minimal_create_runtime_yaml(ctx)
-        if provider_api_key:
-            # Write .env file directly (outside template system for security)
+        # Write .env file for non-Bedrock providers (outside template system for security)
+        # Always write if model provider requires API key, even if empty (user can fill in later)
+        if ctx.model_provider and ctx.model_provider != ModelProvider.Bedrock:
             _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
     else:
         _apply_iac_generation(ctx, agent_config)

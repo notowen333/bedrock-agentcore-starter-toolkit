@@ -119,7 +119,11 @@ def _runtime_only_generate(
             f"Supported providers: {', '.join(supported_providers)}"
         )
     if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
-        provider_api_key = ask_text(f"{model_provider} API Key: (empty to provide in .env later)", redact=True)
+        provider_api_key = ask_text(
+            title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
+            default="",
+            redact=True
+        )
 
     generate_project(
         name=project_name,
