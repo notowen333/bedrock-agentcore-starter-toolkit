@@ -18,13 +18,8 @@ logger = logging.getLogger(__name__)
 DEFAULT_MODULE_PATH = "src.main:app"
 
 
-# TODO: Must run inside root project dir to work, should either give better error message or search/run from dir which
-# contains yaml
-# TODO: Test hot reloading, test what happens if yaml is removed, what happens if entrypoint file doesn't exist
 def dev(
-    agent: Optional[str] = typer.Option(
-        None, "--agent", "-a", help="Agent name (use 'agentcore configure list' to see available agents)"
-    ),
+    port: Optional[int] = typer.Option(8080, "--port", "-p", help="Port for development server (default: 8080)"),
     envs: List[str] = typer.Option(  # noqa: B008
         None, "--env", "-env", help="Environment variables for agent (format: KEY=VALUE)"
     ),
@@ -32,20 +27,19 @@ def dev(
     """Start a local development server for your agent with hot reloading."""
     config_path = Path.cwd() / ".bedrock_agentcore.yaml"
 
-    module_path, agent_name = _get_module_path_and_agent_name(config_path, agent)
+    module_path, agent_name = _get_module_path_and_agent_name(config_path)
 
     # Setup environment and port
-    local_env = _setup_dev_environment(envs)
-    port = local_env["PORT"]
+    local_env = _setup_dev_environment(envs, port)
+    devPort = local_env["PORT"]
 
-    # Pre-flight checks: validate entrypoint module, dependencies, and uvicorn availability
-    _validate_entrypoint_module(module_path, local_env)
+    # Pre-flight check: ensure uvicorn is available
     _check_uvicorn_available()
 
     console.print("[green]🚀 Starting development server with hot reloading[/green]")
     console.print(f"[blue]Agent: {agent_name}[/blue]")
     console.print(f"[blue]Module: {module_path}[/blue]")
-    console.print(f"[blue]Server will be available at: http://localhost:{port}/invocations[/blue]")
+    console.print(f"[blue]Server will be available at: http://localhost:{devPort}/invocations[/blue]")
     console.print('[cyan]💡 Test your agent with: agentcore invoke --dev "Hello"[/cyan]')
     console.print("[yellow]Press Ctrl+C to stop the server[/yellow]\n")
 
@@ -58,7 +52,7 @@ def dev(
         "--host",
         "0.0.0.0",  # nosec B104 - dev server intentionally binds to all interfaces
         "--port",
-        str(port),
+        str(devPort),
         "--log-level",
         "info",
     ]
@@ -76,78 +70,65 @@ def dev(
         _handle_error(f"Failed to start development server: {e}")
 
 
-def _get_module_path_and_agent_name(config_path: Path, agent: Optional[str]) -> tuple[str, str]:
+def _get_module_path_and_agent_name(config_path: Path) -> tuple[str, str]:
     """Get module path and agent name, handling missing YAML gracefully."""
-    if not config_path.exists():
-        console.print(
-            "[yellow]⚠️ No configuration file found, using default module path: " + "{DEFAULT_MODULE_PATH}[/yellow]"
-        )
-        return DEFAULT_MODULE_PATH, "default"
+    has_config = config_path.exists()
+    has_default_entrypoint = Path("src/main.py").exists()
 
-    try:
-        project_config = load_config(config_path, autofill_missing_aws=False)
-        agent_config = project_config.get_agent_config(agent)
-        module_path = _get_module_path_from_config(config_path, agent_config)
-        return module_path, agent_config.name
-    except Exception as e:
-        console.print(
-            f"[yellow]⚠️ Error loading config: {e}, using default module path: " + "{DEFAULT_MODULE_PATH}[/yellow]"
+    # Fail fast if no project found
+    if not has_config and not has_default_entrypoint:
+        _handle_error(
+            "No agent project found in current directory.\n\n"
+            "Expected either:\n"
+            "  • .bedrock_agentcore.yaml configuration file, or\n"
+            "  • src/main.py entrypoint file\n\n"
+            "Run 'agentcore dev' from your agent project directory."
         )
-        return DEFAULT_MODULE_PATH, "default"
+
+    # Try to load config if it exists
+    if has_config:
+        try:
+            project_config = load_config(config_path, autofill_missing_aws=False)
+            agent_config = project_config.get_agent_config()
+            if agent_config and agent_config.entrypoint:
+                module_path = _get_module_path_from_config(config_path, agent_config)
+                return module_path, agent_config.name
+
+            console.print(
+                "[yellow]⚠️ No agent entrypoint specified in configuration, using default module path: "
+                + "{DEFAULT_MODULE_PATH}[/yellow]"
+            )
+            return DEFAULT_MODULE_PATH, "default"
+        except Exception as e:
+            if not has_default_entrypoint:
+                _handle_error(f"Failed to load configuration and no default entrypoint found: {e}")
+            console.print(
+                f"[yellow]⚠️ Error loading config: {e}, using default module path: {DEFAULT_MODULE_PATH}[/yellow]"
+            )
+            return DEFAULT_MODULE_PATH, "default"
+
+    # Fall back to default - must have default entrypoint here
+    console.print(f"[yellow]⚠️ No configuration file found, using default module path: {DEFAULT_MODULE_PATH}[/yellow]")
+    return DEFAULT_MODULE_PATH, "default"
 
 
 def _get_module_path_from_config(config_path: Path, agent_config) -> str:
-    """Get module path from config, with fallback to src.main:app."""
+    """Convert config entrypoint to Python module path for uvicorn."""
+    entrypoint_path = Path(agent_config.entrypoint.strip())
+
+    if entrypoint_path.is_dir():
+        entrypoint_path = entrypoint_path / "main.py"
+
+    project_root = config_path.parent
     try:
-        if not agent_config or not agent_config.entrypoint or not agent_config.entrypoint.strip():
-            console.print(
-                "[yellow]⚠️ No entrypoint specified in configuration, using default module path: "
-                + "{DEFAULT_MODULE_PATH}[/yellow]"
-            )
-            return DEFAULT_MODULE_PATH
-
-        entrypoint_path = Path(agent_config.entrypoint.strip())
-
-        # If entrypoint is a directory, look for main.py inside it
-        if entrypoint_path.is_dir():
-            entrypoint_path = entrypoint_path / "main.py"
-
-        # Convert absolute path to module path
-        project_root = config_path.parent
-        return _convert_entrypoint_to_module_path(entrypoint_path, project_root)
-
-    except Exception as e:
-        console.print(
-            f"[yellow]⚠️ Error reading configuration: {e}, using default module path: {DEFAULT_MODULE_PATH}[/yellow]"
-        )
-        return DEFAULT_MODULE_PATH
-
-
-def _convert_entrypoint_to_module_path(entrypoint_path: Path, project_root: Path) -> str:
-    """Convert absolute entrypoint path to Python module path for uvicorn.
-
-    Args:
-        entrypoint_path: Absolute path to the entrypoint file
-        project_root: Project root directory (usually cwd)
-
-    Returns:
-        Module path like 'my_agent.main:app' or 'src.main:app'
-    """
-    try:
-        # Make entrypoint relative to project root
         relative_path = entrypoint_path.relative_to(project_root)
-
-        # Convert path to module notation (remove .py, replace / with .)
-        module_parts = relative_path.with_suffix("").parts
-        module_path = ".".join(module_parts)
-
+        module_path = ".".join(relative_path.with_suffix("").parts)
         return f"{module_path}:app"
     except ValueError:
-        # If entrypoint is outside project root, fall back to filename only
         return f"{entrypoint_path.stem}:app"
 
 
-def _setup_dev_environment(envs: List[str]) -> dict:
+def _setup_dev_environment(envs: List[str], port: Optional[int]) -> dict:
     """Parse environment variables and setup development environment with port handling."""
     env_vars = {}
     if envs:
@@ -162,19 +143,11 @@ def _setup_dev_environment(envs: List[str]) -> dict:
     local_env.update(env_vars)
     local_env["LOCAL_DEV"] = "1"
 
-    # Add src directory to Python path if it exists (for local imports)
-    src_dir = Path("src")
-    if src_dir.exists():
-        current_pythonpath = local_env.get("PYTHONPATH", "")
-        src_path = str(src_dir.absolute())
-        if current_pythonpath:
-            local_env["PYTHONPATH"] = f"{src_path}:{current_pythonpath}"
-        else:
-            local_env["PYTHONPATH"] = src_path
-
-    # Handle port: use user-specified PORT or find available one
-    if "PORT" not in local_env:
+    # Handle port: use CLI arg, env var, or find available one
+    if port is None and "PORT" not in local_env:
         port = _find_available_port()
+        local_env["PORT"] = str(port)
+    elif port is not None:
         local_env["PORT"] = str(port)
 
     return local_env
@@ -190,23 +163,6 @@ def _find_available_port(start_port: int = 8080) -> int:
         except OSError:
             continue
     _handle_error("Could not find available port in range 8080-8180")
-
-
-def _validate_entrypoint_module(module_path: str, env: dict) -> None:
-    """Check if the entrypoint module exists and can be imported before starting uvicorn."""
-    entrypoint_module = module_path.split(":")[0]  # Extract 'src.main' from 'src.main:app'
-
-    _check_entrypoint_file_exists(entrypoint_module)
-    console.print(f"[green]✓ Entrypoint module '{entrypoint_module}' validated successfully[/green]")
-
-
-def _check_entrypoint_file_exists(entrypoint_module: str) -> None:
-    """Check if the entrypoint module file exists."""
-    file_path = entrypoint_module.replace(".", "/") + ".py"
-    if not Path(file_path).exists():
-        _handle_error(
-            f"Entrypoint file not found: {file_path}\nCreate this file with an 'app' variable containing your agent."
-        )
 
 
 def _check_uvicorn_available() -> None:
