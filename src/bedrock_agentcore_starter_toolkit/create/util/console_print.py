@@ -49,9 +49,9 @@ def emit_create_completed_message(ctx: ProjectContext):
     )
 
     next_steps_cmd = (
-        f"cd {ctx.name}/cdk && npm install && npm run cdk synth && npm run cdk:deploy"
+        "cd cdk && npm install && npm run cdk synth && npm run cdk:deploy"
         if ctx.iac_provider == IACProvider.CDK
-        else f"cd {ctx.name}/terraform && terraform init && terraform apply"
+        else "cd terraform && terraform init && terraform apply"
     )
 
     console.print(
@@ -73,6 +73,7 @@ def emit_create_completed_message(ctx: ProjectContext):
             f"Memory Name: [cyan]{ctx.memory_name if ctx.memory_enabled else 'Memory Disabled'}[/cyan]\n"
             f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n\n"
             f"[bold]Next Steps:[/bold]\n"
+            f"[cyan]cd {ctx.name}[/cyan]\n"
             f"[cyan]agentcore dev[/cyan] - Start local development server\n"
             f'[cyan]agentcore invoke --dev "Hello"[/cyan] - Test your agent locally\n'
             f"[cyan]{next_steps_cmd}[/cyan]\n"
