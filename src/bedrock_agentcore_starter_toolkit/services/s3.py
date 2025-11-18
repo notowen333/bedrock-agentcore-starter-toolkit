@@ -56,12 +56,12 @@ def get_or_create_s3_bucket(agent_name: str, account_id: str, region: str) -> st
             ) from e
         elif error_code == "404":
             print(f"Bucket doesn't exist, creating new S3 bucket: {bucket_name}")
-            return create_s3_bucket(bucket_name, region, account_id)
+            return create_s3_bucket(bucket_name, region)
         else:
             raise RuntimeError(f"Unexpected error checking S3 bucket: {e}") from e
 
 
-def create_s3_bucket(bucket_name: str, region: str, account_id: str) -> str:
+def create_s3_bucket(bucket_name: str, region: str) -> str:
     """Create S3 bucket with appropriate configuration."""
     s3 = boto3.client("s3", region_name=region)
 
@@ -69,11 +69,7 @@ def create_s3_bucket(bucket_name: str, region: str, account_id: str) -> str:
         if region == "us-east-1":
             s3.create_bucket(Bucket=bucket_name)
         else:
-            s3.create_bucket(
-                Bucket=bucket_name,
-                CreateBucketConfiguration={"LocationConstraint": region},
-                ExpectedBucketOwner=account_id,
-            )
+            s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": region})
 
         s3.put_bucket_lifecycle_configuration(
             Bucket=bucket_name,

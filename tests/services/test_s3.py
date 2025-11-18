@@ -121,10 +121,10 @@ class TestCreateS3Bucket:
         mock_s3 = Mock()
         mock_boto3_client.return_value = mock_s3
 
-        result = create_s3_bucket("test-bucket", "us-east-1", "123456789012")
+        result = create_s3_bucket("test-bucket", "us-east-1")
 
         assert result == "test-bucket"
-        mock_s3.create_bucket.assert_called_once_with(Bucket="test-bucket", ExpectedBucketOwner="123456789012")
+        mock_s3.create_bucket.assert_called_once_with(Bucket="test-bucket")
         mock_s3.put_bucket_lifecycle_configuration.assert_called_once()
 
     @patch("bedrock_agentcore_starter_toolkit.services.s3.boto3.client")
@@ -133,13 +133,11 @@ class TestCreateS3Bucket:
         mock_s3 = Mock()
         mock_boto3_client.return_value = mock_s3
 
-        result = create_s3_bucket("test-bucket", "us-west-2", "123456789012")
+        result = create_s3_bucket("test-bucket", "us-west-2")
 
         assert result == "test-bucket"
         mock_s3.create_bucket.assert_called_once_with(
-            Bucket="test-bucket",
-            CreateBucketConfiguration={"LocationConstraint": "us-west-2"},
-            ExpectedBucketOwner="123456789012",
+            Bucket="test-bucket", CreateBucketConfiguration={"LocationConstraint": "us-west-2"}
         )
         mock_s3.put_bucket_lifecycle_configuration.assert_called_once()
 
@@ -152,7 +150,7 @@ class TestCreateS3Bucket:
         error = ClientError({"Error": {"Code": "BucketAlreadyOwnedByYou", "Message": "Already exists"}}, "CreateBucket")
         mock_s3.create_bucket.side_effect = error
 
-        result = create_s3_bucket("test-bucket", "us-east-1", "123456789012")
+        result = create_s3_bucket("test-bucket", "us-east-1")
 
         assert result == "test-bucket"
 
@@ -166,4 +164,4 @@ class TestCreateS3Bucket:
         mock_s3.create_bucket.side_effect = error
 
         with pytest.raises(RuntimeError, match="Failed to create S3 bucket"):
-            create_s3_bucket("test-bucket", "us-east-1", "123456789012")
+            create_s3_bucket("test-bucket", "us-east-1")
