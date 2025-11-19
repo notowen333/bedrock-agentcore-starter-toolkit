@@ -6,10 +6,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from ..progress.progress_sink import ProgressSink
 from ..types import ProjectContext
 
 
-def create_and_init_venv(ctx: ProjectContext) -> None:
+def create_and_init_venv(ctx: ProjectContext, sink: ProgressSink) -> None:
     """Create a venv and install dependencies if uv is present."""
     project_root = ctx.output_dir
     pyproject_path = project_root / "pyproject.toml"
@@ -20,8 +21,11 @@ def create_and_init_venv(ctx: ProjectContext) -> None:
     if not _has_uv():
         return
 
-    _run(["uv", "venv", ".venv"], cwd=project_root)
-    _run(["uv", "sync"], cwd=project_root)
+    # Use the new quiet runner here
+    with sink.step("Creating venv", "Created venv"):
+        _run_quiet(["uv", "venv", ".venv"], cwd=project_root)
+    with sink.step("Installing dependencies", "Installed dependencies"):
+        _run_quiet(["uv", "sync"], cwd=project_root)
 
 
 # ---------------------------------------------------------------------------
@@ -34,4 +38,33 @@ def _has_uv() -> bool:
 
 
 def _run(cmd: list[str], cwd: Path) -> None:
+    """Original run method preserved as-is."""
     subprocess.run(cmd, cwd=str(cwd), check=True)
+
+
+def _run_quiet(cmd: list[str], cwd: Path) -> None:
+    """Run a command quietly; show the full output only if it fails."""
+    proc = subprocess.Popen(
+        cmd,
+        cwd=str(cwd),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        universal_newlines=True,
+    )
+
+    captured = []
+
+    # Capture all output silently
+    for line in proc.stdout:
+        captured.append(line)
+
+    proc.wait()
+
+    if proc.returncode != 0:
+        print("\n----- command failed ---------------------------------\n")
+        print(f"Command: {' '.join(cmd)}\n")
+        print("Output:\n")
+        print("".join(captured))
+        print("\n-------------------------------------------------------\n")
+        raise subprocess.CalledProcessError(proc.returncode, cmd)

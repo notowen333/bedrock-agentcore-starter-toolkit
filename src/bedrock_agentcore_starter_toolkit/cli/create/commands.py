@@ -12,7 +12,7 @@ from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateModelProvider, CreateSDKProvider
 from ...utils.runtime.config import load_config
 from ...utils.runtime.schema import BedrockAgentCoreAgentSchema, BedrockAgentCoreConfigSchema
-from ..cli_ui import ask_choice_with_default, ask_text
+from ..cli_ui import _pause_and_new_line_on_finish, ask_choice_with_default, ask_text
 from ..runtime.commands import configure_impl
 from .prompt_util import (
     get_auto_generated_project_name,
@@ -122,7 +122,7 @@ def _runtime_only_generate(
         provider_api_key = ask_text(
             title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
             default="",
-            redact=True
+            redact=True,
         )
 
     generate_project(
@@ -174,6 +174,8 @@ def _monorepo_generate(
         no_title = "No, use default settings"
         if prompt_configure(no_title) != no_title:
             configure_impl(create=True)
+            # pause and show the configure output so it's not jarring
+            _pause_and_new_line_on_finish(sleep_override=1.0)
         pass
 
     generate_project(

@@ -13,6 +13,7 @@ from .configure.resolve import (
 )
 from .constants import ModelProvider, RuntimeProtocol, TemplateDirSelection
 from .features import iac_feature_registry, sdk_feature_registry
+from .progress.progress_sink import ProgressSink
 from .types import CreateIACProvider, CreateModelProvider, CreateSDKProvider, ProjectContext
 from .util.console_print import emit_create_completed_message
 from .util.create_agentcore_yaml import write_minimal_create_runtime_yaml, write_minimal_create_with_iac_project_yaml
@@ -29,6 +30,8 @@ def generate_project(
     agent_config: BedrockAgentCoreAgentSchema | None,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""
+    sink = ProgressSink()
+
     # create directory structure
     output_path = Path.cwd() / name
     output_path.mkdir(exist_ok=False)
@@ -79,19 +82,21 @@ def generate_project(
         else None,
     )
 
-    _apply_baseline_and_sdk_features(ctx)
+    with sink.step("Generating project code", "Generated project"):
+        _apply_baseline_and_sdk_features(ctx)
 
-    if not ctx.iac_provider:
-        ctx.memory_enabled = False
-        write_minimal_create_runtime_yaml(ctx)
-        # Write .env file for non-Bedrock providers (outside template system for security)
-        # Always write if model provider requires API key, even if empty (user can fill in later)
-        if ctx.model_provider and ctx.model_provider != ModelProvider.Bedrock:
-            _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
-    else:
-        _apply_iac_generation(ctx, agent_config)
-        write_minimal_create_with_iac_project_yaml(ctx)
-    create_and_init_venv(ctx)
+        if not ctx.iac_provider:
+            ctx.memory_enabled = False
+            write_minimal_create_runtime_yaml(ctx)
+            # Write .env file for non-Bedrock providers (outside template system for security)
+            # Always write if model provider requires API key, even if empty (user can fill in later)
+            if ctx.model_provider and ctx.model_provider != ModelProvider.Bedrock:
+                _write_env_file_directly(ctx.output_dir, ctx.model_provider, provider_api_key)
+        else:
+            _apply_iac_generation(ctx, agent_config)
+            write_minimal_create_with_iac_project_yaml(ctx)
+    # we have a project... create a venv and emit success message
+    create_and_init_venv(ctx, sink=sink)
     emit_create_completed_message(ctx)
 
 
