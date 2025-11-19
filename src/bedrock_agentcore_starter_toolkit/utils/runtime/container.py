@@ -223,7 +223,7 @@ class ContainerRuntime:
             template_path = Path(__file__).parent / "templates" / "dockerignore.template"
             if template_path.exists():
                 dockerignore_path.write_text(template_path.read_text())
-                log.info("Generated .dockerignore")
+                log.debug("Generated .dockerignore")
 
     def _validate_module_path(self, agent_path: Path, project_root: Path) -> None:
         """Validate that the agent path can be converted to a valid Python module path."""
