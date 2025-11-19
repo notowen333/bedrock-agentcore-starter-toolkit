@@ -28,6 +28,7 @@ def generate_project(
     model_provider: CreateModelProvider | None,
     provider_api_key: str | None,
     agent_config: BedrockAgentCoreAgentSchema | None,
+    use_venv: bool,
 ):
     """Generate a new Bedrock Agent Core project with specified SDK and IaC providers."""
     sink = ProgressSink()
@@ -96,7 +97,8 @@ def generate_project(
             _apply_iac_generation(ctx, agent_config)
             write_minimal_create_with_iac_project_yaml(ctx)
     # we have a project... create a venv install deps
-    create_and_init_venv(ctx, sink=sink)
+    if use_venv:
+        create_and_init_venv(ctx, sink=sink)
     # everything is done emit the blue success panel
     emit_create_completed_message(ctx)
 

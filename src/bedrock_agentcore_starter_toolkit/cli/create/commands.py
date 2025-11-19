@@ -54,6 +54,12 @@ model_provider_api_key_option = typer.Option(
     None, "--provider-api-key", "-key", help="API key for the model provider (required for non-Bedrock providers)"
 )
 
+venv_option = typer.Option(
+    True,
+    "--venv/--no-venv",
+    help="Automatically create a venv and install dependencies",
+)
+
 VALID_SDK = list(CreateSDKProvider.__args__)
 VALID_MODEL_PROVIDERS = list(CreateModelProvider.__args__)
 
@@ -62,11 +68,12 @@ VALID_MODEL_PROVIDERS = list(CreateModelProvider.__args__)
 def create(
     ctx: typer.Context,
     project_name: Optional[str] = typer.Option(None, "--project-name", "-p", help="Project name to create"),
-    iac: CreateIACProvider = iac_option,
+    iac: Optional[CreateIACProvider] = iac_option,
     sdk: CreateSDKProvider = sdk_option,
     runtime_init: bool = runtime_init_option,
     model_provider: CreateModelProvider = model_provider_option,
     provider_api_key: Optional[str] = model_provider_api_key_option,
+    venv_option: bool = venv_option,
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -89,100 +96,91 @@ def create(
             f"project name."
         )
 
+    agent_config: BedrockAgentCoreAgentSchema | None = None
+    # topline prompt to determine path
     if runtime_init is None:
         runtime_init = prompt_runtime_or_monorepo() == "Runtime"
 
+    def _runtime_only_flow():
+        """Runtime code generation path."""
+        nonlocal sdk, model_provider, provider_api_key
+        if not sdk:
+            sdk = ask_choice_with_default(
+                title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS
+            )
+        providers_map = ModelProvider.get_providers_for_context(is_runtime_only=True, sdk_provider=sdk)
+        supported_providers = list(providers_map.keys())
+        if not supported_providers:
+            raise typer.BadParameter(f"SDK '{sdk}' is not compatible with any runtime model providers.")
+        if not model_provider:
+            model_provider = prompt_model_provider(sdk_provider=sdk)
+        if model_provider not in supported_providers:
+            raise typer.BadParameter(
+                f"Model provider '{model_provider}' is not supported for SDK '{sdk}'. "
+                f"Supported providers: {', '.join(supported_providers)}"
+            )
+        if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
+            provider_api_key = ask_text(
+                title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
+                default="",
+                redact=True,
+            )
+
+    def _monorepo_flow():
+        """IAC generation path."""
+        nonlocal sdk, iac, agent_config, model_provider
+        # consume config from configure command and perform validations
+        configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
+
+        if configure_yaml.exists():
+            configure_schema: BedrockAgentCoreConfigSchema = load_config(configure_yaml)
+            if len(configure_schema.agents.keys()) > 1:
+                _handle_error(
+                    message="agentcore create does not currently support multi agent configurations. "
+                    "Try again with a single agent configured. Exiting."
+                )
+            # now assume we have just one agent configured and build the project context
+            agent_config = next(iter(configure_schema.agents.values()))
+            # until there are IAC constructs for direct code deployment, fail yaml if not container
+            if agent_config.deployment_type != "container":
+                _handle_error(
+                    message="agentcore create does not currently support direct code deployment. "
+                    "Try again with deployment_type: container"
+                )
+
+        # Interactively accept IAC/SDK if not provided
+        # entrypoint provided != . means src is provided and we don't need sdk
+        if not sdk and (not agent_config or agent_config.entrypoint == "."):
+            sdk = ask_choice_with_default(
+                title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS
+            )
+            model_provider = prompt_model_provider()
+
+        if not iac:
+            iac = prompt_iac_provider()
+
+        # prompt for agentcore configure
+        configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
+        if not configure_yaml.exists():
+            no_title = "No, use default settings"
+            if prompt_configure(no_title) != no_title:
+                configure_impl(create=True)
+                # pause and show the configure output so it's not jarring
+                _pause_and_new_line_on_finish(sleep_override=1.0)
+            pass
+
     if runtime_init:
-        _runtime_only_generate(project_name, sdk, model_provider, provider_api_key)
+        _runtime_only_flow()
     else:
-        _monorepo_generate(project_name, sdk, iac, model_provider)
+        _monorepo_flow()
 
-
-def _runtime_only_generate(
-    project_name: str,
-    sdk: Optional[CreateSDKProvider],
-    model_provider: Optional[CreateModelProvider],
-    provider_api_key: Optional[str],
-):
-    """Runtime code generation path."""
-    if not sdk:
-        sdk = ask_choice_with_default(title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS)
-    providers_map = ModelProvider.get_providers_for_context(is_runtime_only=True, sdk_provider=sdk)
-    supported_providers = list(providers_map.keys())
-    if not supported_providers:
-        raise typer.BadParameter(f"SDK '{sdk}' is not compatible with any runtime model providers.")
-    if not model_provider:
-        model_provider = prompt_model_provider(sdk_provider=sdk)
-    if model_provider not in supported_providers:
-        raise typer.BadParameter(
-            f"Model provider '{model_provider}' is not supported for SDK '{sdk}'. "
-            f"Supported providers: {', '.join(supported_providers)}"
-        )
-    if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
-        provider_api_key = ask_text(
-            title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
-            default="",
-            redact=True,
-        )
-
+    # all inputs are set. Generate the project.
     generate_project(
         name=project_name,
         sdk_provider=sdk,
         model_provider=model_provider,
         provider_api_key=provider_api_key,
-        iac_provider=None,
-        agent_config=None,
-    )
-
-
-def _monorepo_generate(
-    project_name: str, sdk: Optional[CreateSDKProvider], iac: Optional[CreateIACProvider], model_provider: Optional[str]
-):
-    """IAC generation path."""
-    # consume config from configure command and perform validations
-    configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
-    agent_config: BedrockAgentCoreAgentSchema | None = None
-
-    if configure_yaml.exists():
-        configure_schema: BedrockAgentCoreConfigSchema = load_config(configure_yaml)
-        if len(configure_schema.agents.keys()) > 1:
-            _handle_error(
-                message="agentcore create does not currently support multi agent configurations. "
-                "Try again with a single agent configured. Exiting."
-            )
-        # now assume we have just one agent configured and build the project context
-        agent_config = next(iter(configure_schema.agents.values()))
-        # until there are IAC constructs for direct code deployment, fail configs that aren't configured for container
-        if agent_config.deployment_type != "container":
-            _handle_error(
-                message="agentcore create does not currently support direct code deployment. "
-                "Try again with deployment_type: container"
-            )
-
-    # Interactively accept IAC/SDK if not provided
-    # entrypoint provided != . means src is provided and we don't need sdk
-    if not sdk and (not agent_config or agent_config.entrypoint == "."):
-        sdk = ask_choice_with_default(title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS)
-        model_provider = prompt_model_provider()
-
-    if not iac:
-        iac = prompt_iac_provider()
-
-    # prompt for agentcore configure
-    configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
-    if not configure_yaml.exists():
-        no_title = "No, use default settings"
-        if prompt_configure(no_title) != no_title:
-            configure_impl(create=True)
-            # pause and show the configure output so it's not jarring
-            _pause_and_new_line_on_finish(sleep_override=1.0)
-        pass
-
-    generate_project(
-        name=project_name,
-        sdk_provider=sdk,
         iac_provider=iac,
-        model_provider=model_provider,
-        provider_api_key=None,  # Not supported for IAC until Identity has constructs
         agent_config=agent_config,
+        use_venv=venv_option,
     )

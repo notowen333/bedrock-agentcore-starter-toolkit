@@ -38,12 +38,7 @@ def run_create(tmp_path, monkeypatch, scenario, iac: Optional[IACProvider]) -> t
 
     project_name = "testProj"
 
-    args = [
-        "--project-name",
-        project_name,
-        "--sdk",
-        sdk,
-    ]
+    args = ["--project-name", project_name, "--sdk", sdk, "--no-venv"]
 
     if iac is not None:
         args += ["--iac", iac]

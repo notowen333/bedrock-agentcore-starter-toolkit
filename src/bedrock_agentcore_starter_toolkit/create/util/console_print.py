@@ -22,12 +22,11 @@ def emit_create_completed_message(ctx: ProjectContext):
                 f"\n"
                 f"[bold]Configuration[/bold]\n"
                 f"Memory: [cyan]{'Enabled' if ctx.memory_enabled else 'Disabled'}[/cyan]\n"
-                f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n"(
-                    "[cyan]"
-                    "Run `agentcore configure` to update the configuration before deploying "
-                    "to AWS via `agentcore launch`"
-                    "[/cyan]\n\n"
-                ),
+                f"📄 Config saved to: [dim]{str(ctx.output_dir) + '/.bedrock_agentcore.yaml'}[/dim]\n"
+                f"[cyan]"
+                f"Run `agentcore configure` to update the default configuration before deploying "
+                f"to AWS via `agentcore launch`"
+                f"[/cyan]\n\n"
                 f"[bold]Next Steps:[/bold]\n"
                 f"[cyan]cd {ctx.name}[/cyan]\n"
                 f"[cyan]agentcore dev[/cyan] - Start local development server\n"
