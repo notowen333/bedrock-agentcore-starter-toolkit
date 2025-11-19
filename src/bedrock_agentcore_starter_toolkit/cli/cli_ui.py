@@ -132,7 +132,7 @@ def select_one(title: str, options: dict[str, str], default: str | None = None):
     @kb.add("escape")
     @kb.add("c-c")
     def _(e):
-        e.app.exit(result=None)
+        raise KeyboardInterrupt
 
     root = HSplit(
         [
@@ -185,7 +185,7 @@ def ask_text(title: str, default: str | None = None, redact: bool = False) -> st
     @kb.add("escape")
     @kb.add("c-c")
     def _(ev):
-        ev.app.exit(result=None)
+        raise KeyboardInterrupt
 
     input_row = VSplit(
         [
@@ -257,7 +257,7 @@ def ask_choice(title: str, choices: list[str]) -> str | None:
     @kb.add("escape")
     @kb.add("c-c")
     def _(ev):
-        ev.app.exit(result=None)
+        raise KeyboardInterrupt
 
     choices_text = "  Available: " + ", ".join(choices)
     choices_window = Window(
