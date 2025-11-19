@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [project.scripts]
-agentcore = "bedrock_agentcore_starter_toolkit.cli.cli:main"
+agentcore-dev = "bedrock_agentcore_starter_toolkit.cli.cli:main"
 
 [tool.hatch.metadata]
 allow-direct-references = true
