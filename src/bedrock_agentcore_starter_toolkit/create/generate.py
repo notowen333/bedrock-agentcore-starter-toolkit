@@ -95,8 +95,9 @@ def generate_project(
         else:
             _apply_iac_generation(ctx, agent_config)
             write_minimal_create_with_iac_project_yaml(ctx)
-    # we have a project... create a venv and emit success message
+    # we have a project... create a venv install deps
     create_and_init_venv(ctx, sink=sink)
+    # everything is done emit the blue success panel
     emit_create_completed_message(ctx)
 
 

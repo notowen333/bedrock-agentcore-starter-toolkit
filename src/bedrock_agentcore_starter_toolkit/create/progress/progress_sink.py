@@ -22,7 +22,7 @@ class ProgressSink:
         start = time.time()
 
         # Start Rich spinner — correct API
-        with self.console.status(
+        with console.status(
             f"[{self.MESSAGE_STYLE}]{message}...[/]",
             spinner="dots",
             spinner_style=self.SPINNER_STYLE,
