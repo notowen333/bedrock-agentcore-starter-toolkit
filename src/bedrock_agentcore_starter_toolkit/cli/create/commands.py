@@ -6,7 +6,7 @@ from typing import Optional
 
 import typer
 
-from ...cli.common import _handle_error
+from ...cli.common import _handle_error, _handle_warn
 from ...create.constants import ModelProvider, SDKProvider
 from ...create.generate import generate_project
 from ...create.types import CreateIACProvider, CreateModelProvider, CreateSDKProvider
@@ -78,7 +78,7 @@ def create(
     model_provider: CreateModelProvider = model_provider_option,
     provider_api_key: Optional[str] = model_provider_api_key_option,
     non_interactive_flag: Optional[bool] = non_interactive_flag,
-    venv_option: bool = venv_option
+    venv_option: bool = venv_option,
 ):
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
@@ -162,6 +162,12 @@ def create(
             )
             model_provider = prompt_model_provider()
 
+        if model_provider and model_provider in ModelProvider.REQUIRES_API_KEY:
+            _handle_warn(
+                "Monorepo mode does not yet have built in API key support"
+                "with AgentCore Identity. Securely providing the key to"
+                "AgentCore Runtime is your responsibility."
+            )
         if not iac:
             iac = prompt_iac_provider()
 
