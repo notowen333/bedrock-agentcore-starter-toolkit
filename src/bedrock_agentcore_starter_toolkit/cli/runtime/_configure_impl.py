@@ -14,6 +14,7 @@ from ...operations.runtime import (
     infer_agent_name,
     validate_agent_name,
 )
+from ...utils.aws import get_account_id
 from ...utils.runtime.config import load_config
 from ..common import _handle_error, _print_success, console
 from .configuration_manager import ConfigurationManager
@@ -46,6 +47,21 @@ def configure_impl(
     deployment_type=None,
     runtime=None,
 ):
+    # Create configuration manager early for consistent prompting
+    config_path = Path.cwd() / ".bedrock_agentcore.yaml"
+    config_manager = ConfigurationManager(config_path, non_interactive)
+    # fail running config on an iac created project
+    if load_config(config_path=config_path, autofill_missing_aws=False).is_agentcore_create_with_iac:
+        _handle_error(
+            "Error: Cannot configure a project created with agentcore create monorepo mode"
+            "Create a new project monorepo project to provide configure settings"
+        )
+    # try an operation requiring credentials upfront, so we don't start interactive mode and then fail later.
+    try:
+        get_account_id()
+    except Exception:
+        _handle_error("agentcore configure requires valid aws credentials to run successfully.")
+
     if protocol and protocol.upper() not in ["HTTP", "MCP", "A2A"]:
         _handle_error("Error: --protocol must be either HTTP or MCP or A2A")
 
@@ -108,10 +124,6 @@ def configure_impl(
             _handle_error(f"Error: --idle-timeout ({idle_timeout}s) must be <= --max-lifetime ({max_lifetime}s)")
 
     console.print("[cyan]Configuring Bedrock AgentCore...[/cyan]")
-
-    # Create configuration manager early for consistent prompting
-    config_path = Path.cwd() / ".bedrock_agentcore.yaml"
-    config_manager = ConfigurationManager(config_path, non_interactive)
 
     # create mode configuration is only passed by CLI
     create_mode_enabled = create
