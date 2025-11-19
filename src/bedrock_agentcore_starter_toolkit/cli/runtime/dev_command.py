@@ -40,7 +40,8 @@ def dev(
     console.print(f"[blue]Agent: {agent_name}[/blue]")
     console.print(f"[blue]Module: {module_path}[/blue]")
     console.print(f"[blue]Server will be available at: http://localhost:{devPort}/invocations[/blue]")
-    console.print('[cyan]💡 Test your agent with: agentcore invoke --dev "Hello"[/cyan]')
+    console.print("[cyan]ℹ️  This terminal window will be used to run the dev server [/cyan]")
+    console.print('[cyan]💡 Test your agent with: agentcore invoke --dev "Hello"[/cyan] in a new terminal window')
     console.print("[yellow]Press Ctrl+C to stop the server[/yellow]\n")
 
     cmd = [
