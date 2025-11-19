@@ -43,7 +43,7 @@ sdk_option = typer.Option(
 )
 
 runtime_init_option = typer.Option(
-    None, "--init", help="Use create to initialize the runtime agent SDK code for a project"
+    None, "--init/--no-init", help="Use --init for runtime-only mode or --no-init for monorepo mode with infrastructure"
 )
 
 model_provider_option = typer.Option(
@@ -83,11 +83,18 @@ def create(
     """CLI Implementation for Create Command."""
     if ctx.invoked_subcommand:
         return
+
+    # Auto-detect non-interactive mode if key arguments are provided
+    if not non_interactive_flag and (project_name or sdk or model_provider):
+        non_interactive_flag = True
+
     # welcome command
     if not non_interactive_flag:
         show_create_welcome()
 
     if not project_name:
+        if non_interactive_flag:
+            raise typer.BadParameter("--project-name is required in non-interactive mode")
         project_name = ask_text(title="Project Name (alphanumeric):", default=get_auto_generated_project_name())
 
     # Input Validation
@@ -105,12 +112,18 @@ def create(
     agent_config: BedrockAgentCoreAgentSchema | None = None
     # topline prompt to determine path
     if runtime_init is None:
-        runtime_init = prompt_runtime_or_monorepo() == "Runtime"
+        if non_interactive_flag:
+            # Default to runtime-only mode in non-interactive mode
+            runtime_init = True
+        else:
+            runtime_init = prompt_runtime_or_monorepo() == "Runtime"
 
     def _runtime_only_flow():
         """Runtime code generation path."""
         nonlocal sdk, model_provider, provider_api_key
         if not sdk:
+            if non_interactive_flag:
+                raise typer.BadParameter("--sdk is required for runtime-only mode in non-interactive mode")
             sdk = ask_choice_with_default(
                 title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS
             )
@@ -119,6 +132,11 @@ def create(
         if not supported_providers:
             raise typer.BadParameter(f"SDK '{sdk}' is not compatible with any runtime model providers.")
         if not model_provider:
+            if non_interactive_flag:
+                raise typer.BadParameter(
+                    f"--model-provider is required for runtime-only mode in non-interactive mode. "
+                    f"Supported providers for SDK '{sdk}': {', '.join(supported_providers)}"
+                )
             model_provider = prompt_model_provider(sdk_provider=sdk)
         if model_provider not in supported_providers:
             raise typer.BadParameter(
@@ -126,11 +144,22 @@ def create(
                 f"Supported providers: {', '.join(supported_providers)}"
             )
         if model_provider in ModelProvider.REQUIRES_API_KEY and not provider_api_key:
-            provider_api_key = ask_text(
-                title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
-                default="",
-                redact=True,
-            )
+            if non_interactive_flag:
+                typer.echo(
+                    typer.style(
+                        f"\n⚠️  Warning: No API key provided for {model_provider}. "
+                        f"You have chosen a model provider that requires an API key. "
+                        f"Please set {model_provider.upper()}_API_KEY in your .env file before running your agent.\n",
+                        fg=typer.colors.YELLOW
+                    ),
+                    err=True
+                )
+            else:
+                provider_api_key = ask_text(
+                    title=f"{model_provider} API Key (press Enter to skip, can be set later in .env file):",
+                    default="",
+                    redact=True,
+                )
 
     def _monorepo_flow():
         """IAC generation path."""
@@ -157,9 +186,19 @@ def create(
         # Interactively accept IAC/SDK if not provided
         # entrypoint provided != . means src is provided and we don't need sdk
         if not sdk and (not agent_config or agent_config.entrypoint == "."):
+            if non_interactive_flag:
+                raise typer.BadParameter(
+                    "--sdk is required for monorepo mode in non-interactive mode when agent config doesn't exist or uses default entrypoint"
+                )
             sdk = ask_choice_with_default(
                 title="Agent SDK:", choices=VALID_SDK, empty_default_choice=SDKProvider.STRANDS
             )
+
+        if not model_provider and (not agent_config or agent_config.entrypoint == "."):
+            if non_interactive_flag:
+                raise typer.BadParameter(
+                    "--model-provider is required for monorepo mode in non-interactive mode when agent config doesn't exist or uses default entrypoint"
+                )
             model_provider = prompt_model_provider()
 
         if model_provider and model_provider in ModelProvider.REQUIRES_API_KEY:
@@ -169,17 +208,18 @@ def create(
                 "AgentCore Runtime is your responsibility."
             )
         if not iac:
+            if non_interactive_flag:
+                raise typer.BadParameter("--iac is required for monorepo mode in non-interactive mode")
             iac = prompt_iac_provider()
 
         # prompt for agentcore configure
         configure_yaml = Path.cwd() / ".bedrock_agentcore.yaml"
-        if not configure_yaml.exists():
+        if not configure_yaml.exists() and not non_interactive_flag:
             no_title = "No, use default settings"
             if prompt_configure(no_title) != no_title:
                 configure_impl(create=True)
                 # pause and show the configure output so it's not jarring
                 _pause_and_new_line_on_finish(sleep_override=1.0)
-            pass
 
     if runtime_init:
         _runtime_only_flow()
