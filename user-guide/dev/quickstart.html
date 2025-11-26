@@ -10,7 +10,7 @@
     
     
     
-      <link rel="canonical" href="https://aws.github.io/bedrock-agentcore-starter-toolkit/user-guide/bootstrap/quickstart.html">
+      <link rel="canonical" href="https://aws.github.io/bedrock-agentcore-starter-toolkit/user-guide/dev/quickstart.html">
     
     
     
@@ -21,7 +21,7 @@
 
     
       
-        <title>QuickStart: Generate Production Ready Projects with agentcore create - Amazon Bedrock AgentCore</title>
+        <title>QuickStart: Local Development with agentcore dev - Amazon Bedrock AgentCore</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#quickstart-generate-production-ready-projects-with-agentcore-create" class="md-skip">
+        <a href="#quickstart-local-development-with-agentcore-dev" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              QuickStart: Generate Production Ready Projects with agentcore create
+              QuickStart: Local Development with agentcore dev
             
           </span>
         </div>
@@ -2112,10 +2112,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-agentcore-create" class="md-nav__link">
+  <a href="#what-is-agentcore-dev" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is agentcore create?
+        What is agentcore dev?
       
     </span>
   </a>
@@ -2134,10 +2134,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-run-agentcore-create" class="md-nav__link">
+  <a href="#step-1-navigate-to-your-project" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 1: Run agentcore create
+        Step 1: Navigate to Your Project
       
     </span>
   </a>
@@ -2145,10 +2145,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-inspect-the-generated-monorepo" class="md-nav__link">
+  <a href="#step-2-start-the-development-server" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 2: Inspect the generated monorepo
+        Step 2: Start the Development Server
       
     </span>
   </a>
@@ -2156,10 +2156,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-local-dev" class="md-nav__link">
+  <a href="#step-3-test-your-agent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 3: Local dev
+        Step 3: Test Your Agent
       
     </span>
   </a>
@@ -2167,10 +2167,226 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-deploy" class="md-nav__link">
+  <a href="#step-4-make-changes-and-see-them-live" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Step 4: Deploy
+        Step 4: Make Changes and See Them Live
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agentcore-invoke-dev-test-my-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agentcore invoke --dev &quot;Test my changes&quot;
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-stop-the-development-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5: Stop the Development Server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#advanced-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Port
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-test-with-different-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Test with Different Memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automatic-environment-variable-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automatic Environment Variable Injection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no-agent-project-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Agent Project Found
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#port-already-in-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Port Already in Use
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aws-credentials-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS Credentials Required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-environment-variable-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invalid Environment Variable Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best Practices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-use-envlocal-for-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Use .env.local for Secrets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-test-different-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Test Different Configurations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-keep-dev-server-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Keep Dev Server Running
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-use-multiple-terminal-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Use Multiple Terminal Windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
       
     </span>
   </a>
@@ -2197,79 +2413,201 @@
   
 
 
-<h1 id="quickstart-generate-production-ready-projects-with-agentcore-create">QuickStart: Generate Production Ready Projects with agentcore create<a class="headerlink" href="#quickstart-generate-production-ready-projects-with-agentcore-create" title="Permanent link">&para;</a></h1>
-<p>This tutorial shows you how to use the <code>agentcore create</code> command in the Amazon Bedrock AgentCore <a href="https://github.com/aws/bedrock-agentcore-starter-toolkit">starter toolkit</a>.</p>
-<h2 id="what-is-agentcore-create">What is agentcore create?<a class="headerlink" href="#what-is-agentcore-create" title="Permanent link">&para;</a></h2>
-<p><code>agentcore create</code> is a CLI-based project generator. First, provide the CLI a project name, Agent SDK, and IaC proivder either through the interactive prompt or by specifying <code>--project-name</code>, <code>--sdk</code>, and <code>--iac</code> flags.
-The command will write a project to the <code>cwd/project_name</code> directory that includes runtime code and infrastructure as code (CDK or Terraform) that models your Bedrock AgentCore project.</p>
+<h1 id="quickstart-local-development-with-agentcore-dev">QuickStart: Local Development with <code>agentcore dev</code><a class="headerlink" href="#quickstart-local-development-with-agentcore-dev" title="Permanent link">&para;</a></h1>
+<p>This guide shows how to use the Amazon Bedrock AgentCore development server to rapidly iterate on your agent locally with hot reloading.</p>
+<p><code>agentcore dev</code> starts a local uvicorn server that watches your code for changes and automatically reloads when you save files. This enables a fast development loop without needing to redeploy to AWS after every change.</p>
+<hr />
+<h2 id="what-is-agentcore-dev">What is <code>agentcore dev</code>?<a class="headerlink" href="#what-is-agentcore-dev" title="Permanent link">&para;</a></h2>
+<p>The development server provides:</p>
+<ul>
+<li><strong>Hot Reloading</strong> - Automatically detects code changes and restarts the server</li>
+<li><strong>Local Testing</strong> - Test your agent locally before deploying to Bedrock Agentcore</li>
+<li><strong>Environment Configuration</strong> - Inject environment variables for testing different configurations</li>
+</ul>
+<p>The dev server runs your agent using the <a href="https://github.com/aws/bedrock-agentcore-sdk-python/blob/main/src/bedrock_agentcore/runtime/app.py">Bedrock AgentCore SDK</a> ASGI application, just like it runs in production on AgentCore Runtime.</p>
+<hr />
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Python 3.10+</strong> installed</li>
-<li><strong>AWS Account</strong> with credentials configured. To configure your AWS credentials, see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">Configuration and credential file settings in the AWS CLI</a>.</li>
-<li><strong>Permissions</strong> sufficient to deploy the modeled CDK or Terraform. The outputs of this tool are variable, so confirm the IAM permissions neccessary to deploy successfully.</li>
+<li>Python <strong>3.10+</strong></li>
+<li><strong>uv</strong> installed</li>
+<li>An AgentCore project created by running <code>agentcore create</code>:</li>
+<li>A <code>.bedrock_agentcore.yaml</code> configuration file, OR</li>
+<li>A <code>src/main.py</code> entrypoint file</li>
+<li><strong>AWS credentials</strong> configured (only if using Bedrock as model provider)</li>
+<li>Project dependencies installed</li>
 </ul>
-<h2 id="step-1-run-agentcore-create">Step 1: Run agentcore create<a class="headerlink" href="#step-1-run-agentcore-create" title="Permanent link">&para;</a></h2>
-<p>Run <code>agentcore create</code> and follow the interactive prompts to name your project, select an Agent SDK, and select an IaC provider.</p>
-<p>Optional: <code>agentcore create</code> can consume and configure project settings from <code>.bedrock_agentcore.yaml</code>. To provide those settings, first run <code>agentcore configure --create</code> to
-specify agent name, authorization configuration, request header allowlist, and memory configuration. The <code>--create</code> flag streamlines the questionaire to only configure settings that <code>create</code> supports.</p>
-<p>If <code>agentcore configure</code> is run in the standard settings with already provided source code, you can still run <code>agentcore create</code>. However, the generated project will copy over your existing source code
-instead of generating source code. The IaC configuration will be simplified to create only an AgentCore runtime and a memory resource if it is specified in the <code>.bedrock_agentcore.yaml</code> spec.</p>
-<p>Note, not all settings are supported by <code>create</code> currently. Multiple agents, IAM profiles</p>
-<h2 id="step-2-inspect-the-generated-monorepo">Step 2: Inspect the generated monorepo<a class="headerlink" href="#step-2-inspect-the-generated-monorepo" title="Permanent link">&para;</a></h2>
-<p>Inspect the project output. Start with <code>project_name/README.md</code>. Inspect runtime code in the <code>src/</code> directory and modeled IaC code in the <code>cdk/</code> or <code>terraform/</code> directory (depending on your selection).</p>
-<h2 id="step-3-local-dev">Step 3: Local dev<a class="headerlink" href="#step-3-local-dev" title="Permanent link">&para;</a></h2>
-<p>Create and activate a venv in your new project:</p>
-<div class="highlight"><pre><span></span><code>cd project_name/src
-
-# If you have uv installed (recommended)
-uv sync  # automatically creates .venv if not present
-
-# pip approach
-# python -m venv .venv
-# source .venv/bin/activate
-# pip install .
-
-# Activate the environment (works for either)
-source .venv/bin/activate
-
-cd ..
+<hr />
+<h2 id="step-1-navigate-to-your-project">Step 1: Navigate to Your Project<a class="headerlink" href="#step-1-navigate-to-your-project" title="Permanent link">&para;</a></h2>
+<p>Start from the root of your AgentCore project. If you don't have a project yet, create one with <a href="../create/quickstart.html"><code>agentcore create</code></a>.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>my-agent-project
 </code></pre></div>
-<p>Run and invoke the local server with hot-reloading of local changes:
-<div class="highlight"><pre><span></span><code>python run_local_server.py
-
-# In a new terminal session
-python invoke_local_server.py &quot;What can you do?&quot;
-</code></pre></div></p>
-<h2 id="step-4-deploy">Step 4: Deploy<a class="headerlink" href="#step-4-deploy" title="Permanent link">&para;</a></h2>
-<p>Follow the canonical steps for deploying in your chosen IaC.</p>
-<p>CDK steps:</p>
-<div class="highlight"><pre><span></span><code>First check that Node version is &gt;= 18:
-- `node -v` → example output: `v18.19.0`
-- [nvm](https://github.com/nvm-sh/nvm) is a helpful tool to manage Node versions
-
-Make sure you have AWS credentials with sufficient permissions in your environment.
-
-To deploy your project:
-
-- shorthand: `cd cdk &amp;&amp; npm install &amp;&amp; npm run cdk synth &amp;&amp; npm run cdk:deploy`
-- navigate to the `cdk` directory: `cd cdk`
-- install dependencies: `npm install`
-- synth the CDK project: `npm run cdk synth`
-- deploy all stacks: `npm run cdk:deploy`
+<hr />
+<h2 id="step-2-start-the-development-server">Step 2: Start the Development Server<a class="headerlink" href="#step-2-start-the-development-server" title="Permanent link">&para;</a></h2>
+<p>Run the dev server from your project directory:</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>dev
 </code></pre></div>
-<p>Terraform steps:</p>
-<div class="highlight"><pre><span></span><code>First check that the `terraform` binary is installed with version &gt;= 1.2:
-- `terraform version -json | jq -r &#39;.terraform_version&#39;`
-- Terraform install [webpage](https://developer.hashicorp.com/terraform/install)
+<p>You should see output like:</p>
+<div class="highlight"><pre><span></span><code>Starting development server with hot reloading
+Agent: my_agent
+Module: src.main:app
+Server will be available at: http://localhost:8080/invocations
+Test your agent with: agentcore invoke --dev &quot;Hello&quot; in a new terminal window
+This terminal window will be used to run the dev server
+Press Ctrl+C to stop the server
 
-Make sure you have AWS credentials with sufficient permissions in your environment.
-
-- shorthand: `cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply`
-- navigate to the `terraform` directory: `cd terraform`
-- download dependencies: `terraform init`
-- [optional] overview resources to be deployed: `terraform plan`
-- deploy to AWS: `terraform apply`
+INFO:     Will watch for changes in these directories: [&#39;/path/to/project&#39;]
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO:     Started reloader process [12345] using WatchFiles
+INFO:     Started server process [12346]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
 </code></pre></div>
+<p>The server is now running and watching for file changes!</p>
+<hr />
+<h2 id="step-3-test-your-agent">Step 3: Test Your Agent<a class="headerlink" href="#step-3-test-your-agent" title="Permanent link">&para;</a></h2>
+<p>Open a <strong>new terminal window</strong> and invoke your agent:</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>invoke<span class="w"> </span>--dev<span class="w"> </span><span class="s2">&quot;What can you do?&quot;</span>
+</code></pre></div>
+<p>You should see the agent's response streamed to your terminal.</p>
+<hr />
+<h2 id="step-4-make-changes-and-see-them-live">Step 4: Make Changes and See Them Live<a class="headerlink" href="#step-4-make-changes-and-see-them-live" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Open <code>src/main.py</code> in your editor</li>
+<li>Modify the agent's system prompt or add a new tool</li>
+<li>Save the file</li>
+<li>
+<p>Watch the dev server output - you'll see:</p>
+<div class="highlight"><pre><span></span><code>INFO:     Detected changes in &#39;src/main.py&#39;
+INFO:     Reloading...
+INFO:     Application shutdown complete.
+INFO:     Application startup complete.
+</code></pre></div>
+</li>
+<li>
+<p>Invoke your agent again to see the changes immediately:</p>
+</li>
+</ol>
+<h2 id="agentcore-invoke-dev-test-my-changes"><div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>invoke<span class="w"> </span>--dev<span class="w"> </span><span class="s2">&quot;Test my changes&quot;</span>
+</code></pre></div><a class="headerlink" href="#agentcore-invoke-dev-test-my-changes" title="Permanent link">&para;</a></h2>
+<h2 id="step-5-stop-the-development-server">Step 5: Stop the Development Server<a class="headerlink" href="#step-5-stop-the-development-server" title="Permanent link">&para;</a></h2>
+<p>In the terminal running the dev server, press:</p>
+<div class="highlight"><pre><span></span><code>Ctrl+C
+</code></pre></div>
+<p>You'll see:</p>
+<div class="highlight"><pre><span></span><code>Shutting down development server...
+Development server stopped
+</code></pre></div>
+<hr />
+<h2 id="advanced-usage">Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permanent link">&para;</a></h2>
+<h3 id="custom-port">Custom Port<a class="headerlink" href="#custom-port" title="Permanent link">&para;</a></h3>
+<p>If port 8080 is already in use, specify a different port:</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>dev<span class="w"> </span>--port<span class="w"> </span><span class="m">9000</span>
+</code></pre></div>
+<p>Then invoke with:</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>invoke<span class="w"> </span>--dev<span class="w"> </span>--port<span class="w"> </span><span class="m">9000</span><span class="w"> </span><span class="s2">&quot;Hello&quot;</span>
+</code></pre></div>
+<p><strong>Automatic Port Selection</strong>: If the requested port is unavailable, the dev server will automatically find the next available port and use it. The port in use will be displayed when the dev server is running.</p>
+<hr />
+<h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
+<p>Override environment variables for testing different configurations:</p>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">AWS_REGION</span><span class="o">=</span>us-west-2<span class="w"> </span>--env<span class="w"> </span><span class="nv">DEBUG</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>
+<h3 id="example-test-with-different-memory">Example: Test with Different Memory<a class="headerlink" href="#example-test-with-different-memory" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">BEDROCK_AGENTCORE_MEMORY_ID</span><span class="o">=</span>test-memory-123
+</code></pre></div>
+<hr />
+<h2 id="automatic-environment-variable-injection">Automatic Environment Variable Injection<a class="headerlink" href="#automatic-environment-variable-injection" title="Permanent link">&para;</a></h2>
+<p>If your <code>.bedrock_agentcore.yaml</code> includes memory or AWS configuration, these environment variables are automatically injected:</p>
+<ul>
+<li><code>BEDROCK_AGENTCORE_MEMORY_ID</code> - From <code>memory.memory_id</code> in config</li>
+<li><code>AWS_REGION</code> - From <code>aws.region</code> in config</li>
+<li><code>LOCAL_DEV=1</code> - Always set to indicate local development mode</li>
+</ul>
+<p>This matches the environment your agent will have in production.</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="no-agent-project-found">No Agent Project Found<a class="headerlink" href="#no-agent-project-found" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>No agent project found in current directory.
+
+Expected either:
+  &quot; .bedrock_agentcore.yaml configuration file, or
+  &quot; src/main.py entrypoint file
+
+Run &#39;agentcore dev&#39; from your agent project directory.
+</code></pre></div>
+<p><strong>Solution</strong>: Navigate to your project root or create a project with <code>agentcore create</code>.</p>
+<hr />
+<h3 id="port-already-in-use">Port Already in Use<a class="headerlink" href="#port-already-in-use" title="Permanent link">&para;</a></h3>
+<p>If you see:</p>
+<div class="highlight"><pre><span></span><code>Port 8080 is already in use
+Using port 8081 instead
+Test your agent with: agentcore invoke --dev --port 8081 &quot;Hello&quot; in a new terminal window
+</code></pre></div>
+<p>The dev server automatically found an available port. Use the displayed port number when invoking.</p>
+<hr />
+<h3 id="aws-credentials-required">AWS Credentials Required<a class="headerlink" href="#aws-credentials-required" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Local dev with Bedrock as the model provider requires AWS creds
+</code></pre></div>
+<p><strong>Solution</strong>: Configure AWS credentials if using Bedrock models:</p>
+<div class="highlight"><pre><span></span><code>aws<span class="w"> </span>configure
+</code></pre></div>
+<p>Or set environment variables:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span>your_key
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span>your_secret
+<span class="nb">export</span><span class="w"> </span><span class="nv">AWS_REGION</span><span class="o">=</span>us-east-1
+</code></pre></div>
+<p><strong>Note</strong>: AWS credentials are only required if using Bedrock as your model provider. API key-based providers (OpenAI, Anthropic, etc.) don't need AWS credentials.</p>
+<hr />
+<h3 id="invalid-environment-variable-format">Invalid Environment Variable Format<a class="headerlink" href="#invalid-environment-variable-format" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Invalid environment variable format: INVALID_FORMAT. Use KEY=VALUE format.
+</code></pre></div>
+<p><strong>Solution</strong>: Ensure <code>--env</code> flags use the <code>KEY=VALUE</code> format:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#  Correct</span>
+agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">API_KEY</span><span class="o">=</span>secret123
+
+<span class="c1">#  Incorrect</span>
+agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span>API_KEY<span class="w"> </span>secret123
+</code></pre></div>
+<hr />
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="1-use-envlocal-for-secrets">1. Use <code>.env.local</code> for Secrets<a class="headerlink" href="#1-use-envlocal-for-secrets" title="Permanent link">&para;</a></h3>
+<p>Store API keys and secrets in <code>.env.local</code> (gitignored by default):</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># .env.local</span>
+<span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span>sk-ant-xxxxx
+<span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-xxxxx
+</code></pre></div>
+<p>The dev server automatically loads values from <code>.env.local</code> when running locally.</p>
+<hr />
+<h3 id="2-test-different-configurations">2. Test Different Configurations<a class="headerlink" href="#2-test-different-configurations" title="Permanent link">&para;</a></h3>
+<p>Use <code>--env</code> to quickly test different configurations:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Test in different region</span>
+agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">AWS_REGION</span><span class="o">=</span>eu-west-1
+
+<span class="c1"># Test with verbose logging</span>
+agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">LOG_LEVEL</span><span class="o">=</span>DEBUG
+
+<span class="c1"># Test without memory</span>
+agentcore<span class="w"> </span>dev<span class="w"> </span>--env<span class="w"> </span><span class="nv">BEDROCK_AGENTCORE_MEMORY_ID</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</code></pre></div>
+<hr />
+<h3 id="3-keep-dev-server-running">3. Keep Dev Server Running<a class="headerlink" href="#3-keep-dev-server-running" title="Permanent link">&para;</a></h3>
+<p>Leave the dev server running in one terminal while you work in your editor. The hot reload will handle restarts automatically.</p>
+<hr />
+<h3 id="4-use-multiple-terminal-windows">4. Use Multiple Terminal Windows<a class="headerlink" href="#4-use-multiple-terminal-windows" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Terminal 1</strong>: Run <code>agentcore dev</code></li>
+<li><strong>Terminal 2</strong>: Run <code>agentcore invoke --dev "test queries"</code></li>
+<li><strong>Terminal 3</strong>: Edit code, run tests, view logs</li>
+</ul>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Deploy your agent</strong>: Use <a href="../runtime/quickstart.html"><code>agentcore launch</code></a> for simple deployments</li>
+<li><strong>Add more tools</strong>: Integrate MCP tools or custom functions</li>
+<li><strong>Configure memory</strong>: Set up <a href="../memory/quickstart.html">AgentCore Memory</a> for stateful agents</li>
+<li><strong>Review logs</strong>: Monitor uvicorn output for errors or performance issues</li>
+</ul>
+<hr />
 
 
 

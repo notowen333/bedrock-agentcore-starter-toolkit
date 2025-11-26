@@ -20,7 +20,7 @@ if __name__ == "__main__":
 ```
 # Configure and deploy your agent
 agentcore configure --entrypoint my_agent.py --non-interactive
-agentcore launch
+agentcore deploy
 agentcore invoke '{"name": "Alice"}'
 ```
 
@@ -48,7 +48,7 @@ The Runtime SDK is a comprehensive Python framework that bridges the gap between
 
 ```
 agentcore configure --entrypoint my_agent.py
-agentcore launch                    # Uses CodeBuild for containers, .zip archive for direct deploy
+agentcore deploy                    # Uses CodeBuild for containers, .zip archive for direct deploy
 ```
 
 - **Works everywhere** - SageMaker Notebooks, Cloud9, laptops
@@ -57,7 +57,7 @@ agentcore launch                    # Uses CodeBuild for containers, .zip archiv
 ### 💻 Local Development
 
 ```
-agentcore launch --local           # Build and run locally
+agentcore deploy --local           # Build and run locally
 ```
 
 - **Fast iteration** - immediate feedback and debugging
@@ -65,7 +65,7 @@ agentcore launch --local           # Build and run locally
 ### 🔧 Hybrid Build
 
 ```
-agentcore launch --local-build     # Build locally, deploy to cloud
+agentcore deploy --local-build     # Build locally, deploy to cloud
 ```
 
 - **For complex scenarios** - large apps, system dependencies
@@ -204,21 +204,7 @@ AgentCore Runtime supports asynchronous processing for long-running tasks. Your 
 - Returns to "Healthy" when tasks complete
 - Sessions automatically terminate after 15 minutes of inactivity
 
-**Three Processing Approaches:**
-
-1. **Async Task Decorator (Recommended)**
-
-   ```
-   @app.async_task
-   async def background_work():
-       await process_data()  # Status becomes "HealthyBusy"
-       return "done"
-
-   @app.entrypoint
-   async def handler(event):
-       asyncio.create_task(background_work())
-       return {"status": "started"}
-   ```
+**Two Processing Approaches:**
 
 1. **Manual Task Management**
 
@@ -272,14 +258,14 @@ if __name__ == "__main__":
 agentcore configure --entrypoint my_agent.py
 
 # 2. Develop locally
-agentcore launch --local
+agentcore deploy --local
 
 # 3. Test
 agentcore invoke '{"prompt": "Hello"}'
 agentcore invoke '{"prompt": "Remember this"}' --session-id "test"
 
 # 4. Deploy to cloud
-agentcore launch
+agentcore deploy
 
 # 5. Monitor
 agentcore status
